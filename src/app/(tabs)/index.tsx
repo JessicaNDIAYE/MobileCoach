@@ -1,27 +1,46 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { Alert, Text, View, useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 
-import { Button, Card, Input, Muted, Screen, colors, styles } from '@/components/ui';
+import { Ruler } from '@/components/Ruler';
+import {
+  BigNumber,
+  Card,
+  CardHeader,
+  Divider,
+  IconButton,
+  Muted,
+  PillButton,
+  Row,
+  Screen,
+  Stats,
+  TextTabs,
+  TickGauge,
+  s,
+} from '@/components/ui';
 import { fmtDate, today } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 import type { Profile, WeightEntry, WeightMode } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
+import { colors } from '@/theme';
 
 const MODES: { value: WeightMode; label: string }[] = [
-  { value: 'lose', label: 'Perte' },
-  { value: 'gain', label: 'Prise' },
+  { value: 'lose', label: 'Perte de poids' },
+  { value: 'gain', label: 'Prise de poids' },
   { value: 'keep', label: 'Maintien' },
 ];
+
+const kg = (n: number) => n.toFixed(1).replace('.', ',');
+const longDate = () => new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 
 export default function ProfileScreen() {
   const userId = useUserId();
   const { width } = useWindowDimensions();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [entries, setEntries] = useState<WeightEntry[]>([]);
-  const [weight, setWeight] = useState('');
-  const [goal, setGoal] = useState('');
+  const [loaded, setLoaded] = useState(false);
+  const [picked, setPicked] = useState(60);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -29,119 +48,122 @@ export default function ProfileScreen() {
       supabase.from('profiles').select('*').eq('id', userId).single(),
       supabase.from('weight_entries').select('id, measured_on, weight_kg').order('measured_on').limit(60),
     ]);
-    if (p.data) {
-      setProfile(p.data);
-      setGoal(p.data.weight_goal_kg?.toString() ?? '');
-    }
-    setEntries(w.data ?? []);
-  }, [userId]);
+    const list: WeightEntry[] = (w.data ?? []).map((e) => ({ ...e, weight_kg: Number(e.weight_kg) }));
+    if (p.data) setProfile({ ...p.data, weight_goal_kg: p.data.weight_goal_kg != null ? Number(p.data.weight_goal_kg) : null });
+    setEntries(list);
+    if (!loaded) setPicked(list.at(-1)?.weight_kg ?? 60);
+    setLoaded(true);
+  }, [userId, loaded]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
   async function updateProfile(patch: Partial<Profile>) {
+    setProfile((p) => (p ? { ...p, ...patch } : p));
     const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
     if (error) Alert.alert('Erreur', error.message);
-    else setProfile((p) => (p ? { ...p, ...patch } : p));
   }
 
-  async function addWeight() {
-    const kg = Number(weight.replace(',', '.'));
-    if (!kg) return;
+  async function saveWeight() {
     setSaving(true);
-    // Une seule pesée par jour : on remplace celle du jour si elle existe.
+    // Une pesée par jour : celle du jour est remplacée si elle existe déjà.
     const { error } = await supabase
       .from('weight_entries')
-      .upsert({ user_id: userId, measured_on: today(), weight_kg: kg }, { onConflict: 'user_id,measured_on' });
+      .upsert({ user_id: userId, measured_on: today(), weight_kg: picked }, { onConflict: 'user_id,measured_on' });
     setSaving(false);
     if (error) return Alert.alert('Erreur', error.message);
-    setWeight('');
     load();
   }
 
-  const last = entries.at(-1)?.weight_kg;
-  const first = entries[0]?.weight_kg;
+  const last = entries.at(-1)?.weight_kg ?? null;
+  const first = entries[0]?.weight_kg ?? null;
   const target = profile?.weight_goal_kg ?? null;
-  const values = entries.map((e) => Number(e.weight_kg));
-  const min = Math.floor(Math.min(...values, target ?? Infinity) - 1);
 
-  let goalText = '';
-  if (last != null && target != null) {
-    const rest = target - last;
-    const reached =
-      (profile?.weight_mode === 'lose' && rest >= 0) ||
-      (profile?.weight_mode === 'gain' && rest <= 0) ||
-      (profile?.weight_mode === 'keep' && Math.abs(rest) <= 1);
-    goalText = reached ? '🎉 Objectif atteint !' : `Encore ${Math.abs(rest).toFixed(1)} kg ${rest < 0 ? 'à perdre' : 'à prendre'}`;
+  // Progression vers l'objectif, du premier poids enregistré jusqu'à la cible.
+  let progress = 0;
+  if (last != null && first != null && target != null && first !== target) {
+    progress = (first - last) / (first - target);
   }
+  const remaining = last != null && target != null ? Math.abs(target - last) : null;
+
+  const values = entries.map((e) => e.weight_kg);
+  const floor = Math.floor(Math.min(...values, target ?? Infinity) - 1);
 
   return (
-    <Screen>
-      <Card title={`Salut ${profile?.username ?? ''} 👋`} right={<Pressable onPress={() => supabase.auth.signOut()}><Text style={styles.muted}>Déconnexion</Text></Pressable>}>
-        <Muted>Ton objectif</Muted>
-        <View style={{ flexDirection: 'row', gap: 6 }}>
-          {MODES.map((m) => (
-            <Button
-              key={m.value}
-              label={m.label}
-              variant={profile?.weight_mode === m.value ? 'primary' : 'ghost'}
-              onPress={() => updateProfile({ weight_mode: m.value })}
-              style={{ flex: 1 }}
-            />
-          ))}
-        </View>
-        <View style={styles.row}>
-          <Input placeholder="Poids cible (kg)" keyboardType="decimal-pad" value={goal} onChangeText={setGoal} />
-          <Button label="OK" onPress={() => updateProfile({ weight_goal_kg: Number(goal.replace(',', '.')) || null })} />
-        </View>
-      </Card>
-
-      <Card title="Pesée du jour">
-        <View style={styles.row}>
-          <Input placeholder="kg" keyboardType="decimal-pad" value={weight} onChangeText={setWeight} />
-          <Button label="Ajouter" onPress={addWeight} loading={saving} />
-        </View>
+    <Screen
+      eyebrow="Aujourd’hui"
+      title={longDate()}
+      subtitle={profile?.username ? `Salut ${profile.username}` : 'Ton poids'}
+      right={<IconButton name="log-out" onPress={() => supabase.auth.signOut()} />}
+    >
+      <Card>
+        <CardHeader title="Poids" right={<Muted>{entries.length ? fmtDate(entries.at(-1)!.measured_on) : '—'}</Muted>} />
         {last != null ? (
-          <View>
-            <Text style={styles.big}>{Number(last).toFixed(1)} kg</Text>
-            <Muted>
-              {first != null && `${last - first >= 0 ? '+' : ''}${(last - first).toFixed(1)} kg depuis le début`}
-              {goalText && ` · ${goalText}`}
-            </Muted>
-          </View>
+          <>
+            <Row style={{ alignItems: 'baseline' }}>
+              <BigNumber value={kg(last)} />
+              {target != null && <Muted>{kg(target)} kg visés</Muted>}
+            </Row>
+            <TickGauge ratio={progress} />
+            <Stats
+              items={[
+                ['Départ', first != null ? kg(first) : '—'],
+                ['Écart', first != null ? `${last - first > 0 ? '+' : ''}${kg(last - first)}` : '—'],
+                ['Reste', remaining != null ? kg(remaining) : '—'],
+              ]}
+            />
+          </>
         ) : (
-          <Muted>Aucune pesée pour l'instant.</Muted>
+          <Muted>Aucune pesée pour l’instant. Fais glisser la règle ci-dessous pour enregistrer la première.</Muted>
         )}
       </Card>
 
+      <Card>
+        <CardHeader title="Nouvelle pesée" right={<Muted>{fmtDate(today())}</Muted>} />
+        {loaded && <Ruler key={String(loaded)} value={picked} onChange={setPicked} />}
+        <PillButton label="Enregistrer la pesée" icon="arrow-right" onPress={saveWeight} loading={saving} />
+        <PillButton label="Définir comme objectif" variant="light" onPress={() => updateProfile({ weight_goal_kg: picked })} />
+      </Card>
+
+      <Card>
+        <CardHeader title="Objectif" />
+        <TextTabs options={MODES} value={profile?.weight_mode ?? 'lose'} onChange={(m) => updateProfile({ weight_mode: m })} />
+      </Card>
+
       {entries.length >= 2 && (
-        <Card title="Évolution">
+        <Card>
+          <CardHeader title="Évolution" right={<Muted>{entries.length} pesées</Muted>} />
           <LineChart
-            data={entries.map((e) => ({ value: Number(e.weight_kg) - min, label: fmtDate(e.measured_on) }))}
-            yAxisOffset={0}
-            formatYLabel={(v) => (Number(v) + min).toFixed(0)}
-            width={width - 100}
-            height={180}
+            data={entries.map((e) => ({ value: e.weight_kg - floor }))}
+            formatYLabel={(v) => String(Math.round(Number(v) + floor))}
+            width={width - 112}
+            height={160}
             adjustToWidth
             curved
-            color={colors.green}
-            dataPointsColor={colors.green}
-            thickness={3}
+            hideDataPoints
+            color={colors.forest}
+            thickness={2}
             hideRules
-            xAxisLabelTextStyle={{ fontSize: 9, color: colors.muted }}
+            yAxisColor="transparent"
+            xAxisColor={colors.line}
+            yAxisTextStyle={{ color: colors.inkSoft, fontSize: 11 }}
+            noOfSections={4}
             showReferenceLine1={target != null}
-            referenceLine1Position={target != null ? target - min : 0}
-            referenceLine1Config={{ color: colors.orange, dashWidth: 4, dashGap: 4 }}
+            referenceLine1Position={target != null ? target - floor : 0}
+            referenceLine1Config={{ color: colors.clay, dashWidth: 3, dashGap: 5, thickness: 1 }}
           />
-          {target != null && <Muted>— — objectif {target} kg</Muted>}
         </Card>
       )}
 
       {entries.length > 0 && (
-        <Card title="Dernières pesées">
-          {[...entries].reverse().slice(0, 7).map((e) => (
-            <View key={e.id} style={styles.listItem}>
-              <Text style={[styles.bold, { flex: 1 }]}>{Number(e.weight_kg).toFixed(1)} kg</Text>
-              <Muted>{fmtDate(e.measured_on)}</Muted>
+        <Card style={{ gap: 12 }}>
+          <CardHeader title="Historique" />
+          {[...entries].reverse().slice(0, 6).map((e, i) => (
+            <View key={e.id} style={{ gap: 12 }}>
+              {i > 0 && <Divider />}
+              <View style={s.rowBetween}>
+                <Text style={s.body}>{fmtDate(e.measured_on)}</Text>
+                <Text style={s.bold}>{kg(e.weight_kg)} kg</Text>
+              </View>
             </View>
           ))}
         </Card>

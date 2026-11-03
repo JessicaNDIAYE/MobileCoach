@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 
-import { colors } from '@/components/ui';
+import { colors } from '@/theme';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 
 function RootNavigator() {
@@ -11,13 +11,13 @@ function RootNavigator() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', backgroundColor: colors.bg }}>
-        <ActivityIndicator color={colors.green} />
+        <ActivityIndicator color={colors.ink} />
       </View>
     );
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>

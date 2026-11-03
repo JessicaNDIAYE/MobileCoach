@@ -1,22 +1,17 @@
-import Tabs from 'expo-router/js-tabs';
-import { Text } from 'react-native';
+import { Tabs } from 'expo-router/js-tabs';
 
-import { colors } from '@/components/ui';
-
-const icon = (emoji: string) => () => <Text style={{ fontSize: 20 }}>{emoji}</Text>;
+import { TabBar } from '@/components/TabBar';
+import { colors } from '@/theme';
 
 export default function TabsLayout() {
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: colors.green,
-        headerStyle: { backgroundColor: colors.green },
-        headerTintColor: '#fff',
-      }}
+      tabBar={(props) => <TabBar {...props} />}
+      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.bg } }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Profil & poids', tabBarLabel: 'Profil', tabBarIcon: icon('⚖️') }} />
-      <Tabs.Screen name="courses" options={{ title: 'Courses & budget', tabBarLabel: 'Courses', tabBarIcon: icon('🛒') }} />
-      <Tabs.Screen name="defis" options={{ title: 'Défis entre amis', tabBarLabel: 'Défis', tabBarIcon: icon('🏆') }} />
+      <Tabs.Screen name="index" options={{ title: 'Profil' }} />
+      <Tabs.Screen name="courses" options={{ title: 'Courses' }} />
+      <Tabs.Screen name="defis" options={{ title: 'Défis' }} />
     </Tabs>
   );
 }
