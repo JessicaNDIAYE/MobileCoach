@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "MobileCoach",
+    "slug": "mobilecoach",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jessicandiaye.mobilecoach"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.jessicandiaye.mobilecoach"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "MobileCoach acc\u00e8de \u00e0 tes photos pour enregistrer tes plats et tickets de caisse.",
+          "cameraPermission": "MobileCoach utilise l'appareil photo pour scanner tes tickets et photographier tes plats."
+        }
+      ]
+    ],
+    "scheme": "mobilecoach",
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
