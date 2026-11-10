@@ -8,7 +8,11 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jessicandiaye.mobilecoach"
+      "bundleIdentifier": "com.jessicandiaye.mobilecoach",
+      "buildNumber": "1",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +32,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "MobileCoach acc\u00e8de \u00e0 tes photos pour enregistrer tes plats et tickets de caisse.",
+          "photosPermission": "MobileCoach accède à tes photos pour enregistrer tes plats et tickets de caisse.",
           "cameraPermission": "MobileCoach utilise l'appareil photo pour scanner tes tickets et photographier tes plats."
         }
       ]

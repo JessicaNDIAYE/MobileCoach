@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { Alert, Text, View, useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 
+import { AccountCard } from '@/components/AccountCard';
 import { Ruler } from '@/components/Ruler';
 import {
   BigNumber,
@@ -168,6 +169,8 @@ export default function ProfileScreen() {
           ))}
         </Card>
       )}
+
+      <AccountCard />
     </Screen>
   );
 }

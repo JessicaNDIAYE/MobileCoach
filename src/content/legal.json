@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "appName": "MobileCoach",
+    "editor": "[NOM DE L'ÉDITEUR]",
+    "contactEmail": "[EMAIL DE CONTACT]",
+    "minAge": 18,
+    "updatedAt": "10 novembre 2026"
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "intro": "Cette politique explique quelles données {{app}} collecte, pourquoi, avec qui elles sont partagées et comment exercer tes droits. Elle s’applique à l’application mobile {{app}}.",
+    "sections": [
+      {
+        "title": "Responsable du traitement",
+        "paragraphs": [
+          "{{editor}} est responsable du traitement de tes données. Pour toute question : {{email}}."
+        ]
+      },
+      {
+        "title": "Données collectées",
+        "bullets": [
+          "Compte : adresse email, pseudo et mot de passe (stocké sous forme chiffrée, jamais lisible).",
+          "Santé : tes pesées, ton objectif de poids et le type d’objectif (perte, prise, maintien).",
+          "Courses : articles achetés, prix, magasins, catégories, dates d’achat et de péremption, budget mensuel.",
+          "Défis : défis créés ou rejoints, validations quotidiennes et grammes de fibres saisis.",
+          "Recettes : l’envie que tu saisis et le mode choisi lorsque tu demandes des recettes."
+        ],
+        "paragraphs": [
+          "{{app}} n’utilise aucun outil de publicité ni de suivi publicitaire, et ne revend aucune donnée."
+        ]
+      },
+      {
+        "title": "Pourquoi nous les utilisons",
+        "bullets": [
+          "Faire fonctionner ton compte et synchroniser tes données entre tes appareils.",
+          "Afficher ton suivi de poids, ton budget et tes statistiques.",
+          "Organiser les défis entre amis et le classement.",
+          "Te proposer des recettes adaptées à ton frigo, ton budget et tes défis."
+        ]
+      },
+      {
+        "title": "Base légale",
+        "paragraphs": [
+          "Le traitement repose sur l’exécution du service que tu as demandé en créant ton compte (CGU).",
+          "Tes données de poids sont des données de santé : elles ne sont traitées qu’avec ton consentement explicite, donné lorsque tu acceptes ces conditions et que tu enregistres une pesée. Tu peux le retirer à tout moment en supprimant tes pesées ou ton compte.",
+          "L’envoi de données au service de recettes repose sur ton consentement, demandé avant la première utilisation."
+        ]
+      },
+      {
+        "title": "Avec qui elles sont partagées",
+        "bullets": [
+          "Supabase (hébergement de la base de données et de l’authentification) : stocke l’ensemble des données de ton compte.",
+          "Google (API Gemini), uniquement quand tu demandes des recettes : reçoit les noms des produits de ton frigo, leurs dates de péremption, ton budget restant du mois, le type de tes défis en cours et l’envie que tu as saisie. Ton email, ton pseudo et ton poids ne sont jamais envoyés.",
+          "Tes amis : dans un défi partagé, les autres participants voient ton pseudo, tes jours réussis et, pour le défi fibres, ton total de fibres. Ils ne voient ni ton poids, ni tes courses, ni ton budget."
+        ],
+        "paragraphs": [
+          "Certains prestataires peuvent traiter des données hors de l’Union européenne. Ces transferts sont encadrés par les clauses contractuelles types de la Commission européenne."
+        ]
+      },
+      {
+        "title": "Durée de conservation",
+        "paragraphs": [
+          "Tes données sont conservées tant que ton compte existe. Quand tu supprimes ton compte depuis l’application (Profil › Supprimer mon compte), toutes tes données et tes photos sont effacées immédiatement et définitivement."
+        ]
+      },
+      {
+        "title": "Sécurité",
+        "paragraphs": [
+          "Les échanges sont chiffrés (HTTPS). Chaque utilisateur ne peut accéder qu’à ses propres données grâce à des règles de sécurité appliquées par la base de données. La clé du service de recettes reste sur le serveur."
+        ]
+      },
+      {
+        "title": "Tes droits",
+        "paragraphs": [
+          "Conformément au RGPD, tu peux accéder à tes données, les rectifier, les effacer, demander leur portabilité, t’opposer à un traitement ou retirer ton consentement. Écris-nous à {{email}}. La suppression du compte est aussi disponible directement dans l’application.",
+          "Tu peux introduire une réclamation auprès de la CNIL (www.cnil.fr)."
+        ]
+      },
+      {
+        "title": "Âge minimum",
+        "paragraphs": [
+          "{{app}} est réservée aux personnes de {{minAge}} ans et plus."
+        ]
+      },
+      {
+        "title": "Modifications",
+        "paragraphs": [
+          "Nous te préviendrons dans l’application en cas de changement important de cette politique."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Conditions d’utilisation",
+    "intro": "En créant un compte sur {{app}}, tu acceptes les présentes conditions. Lis-les attentivement.",
+    "sections": [
+      {
+        "title": "Le service",
+        "paragraphs": [
+          "{{app}} est une application gratuite qui t’aide à suivre ton poids et ton budget courses, à trouver des recettes et à relever des défis alimentaires avec tes amis. Elle est éditée par {{editor}}."
+        ]
+      },
+      {
+        "title": "Avertissement santé",
+        "paragraphs": [
+          "{{app}} n’est pas un dispositif médical et ne remplace pas l’avis d’un médecin, d’un diététicien ou d’un autre professionnel de santé.",
+          "Les objectifs de poids, les défis (zéro sucre, low carb, fibres) et les recettes sont des outils de motivation généraux. Ils ne sont pas adaptés à toutes les situations : grossesse, diabète, maladie chronique, traitement médical ou antécédents de troubles du comportement alimentaire. Demande l’avis d’un professionnel avant de modifier ton alimentation, et arrête un défi en cas de malaise.",
+          "Si ton rapport à la nourriture ou à ton poids te fait souffrir, parles-en à un professionnel de santé."
+        ]
+      },
+      {
+        "title": "Recettes proposées automatiquement",
+        "paragraphs": [
+          "Les recettes sont générées automatiquement par un service tiers (Google Gemini) à partir de tes données. Elles peuvent contenir des erreurs : vérifie toujours les ingrédients, les allergènes, les quantités et la cuisson. Les prix affichés sont des estimations indicatives."
+        ]
+      },
+      {
+        "title": "Ton compte",
+        "bullets": [
+          "Tu dois avoir {{minAge}} ans ou plus.",
+          "Tu es responsable de la confidentialité de ton mot de passe.",
+          "Tu peux supprimer ton compte à tout moment depuis l’application (Profil › Supprimer mon compte)."
+        ]
+      },
+      {
+        "title": "Règles de conduite",
+        "paragraphs": [
+          "Ton pseudo est visible par les personnes avec qui tu partages un défi. Il est interdit d’utiliser un pseudo injurieux, haineux, discriminatoire, à caractère sexuel ou usurpant l’identité d’autrui, et d’utiliser l’application pour harceler d’autres personnes. Tout manquement peut entraîner la suppression du compte. Pour signaler un comportement : {{email}}."
+        ]
+      },
+      {
+        "title": "Responsabilité",
+        "paragraphs": [
+          "Nous faisons de notre mieux pour que l’application fonctionne correctement, sans pouvoir garantir l’absence d’interruption ou d’erreur. {{editor}} ne saurait être tenu responsable des décisions alimentaires, médicales ou financières prises sur la base des informations affichées."
+        ]
+      },
+      {
+        "title": "Modifications et droit applicable",
+        "paragraphs": [
+          "Ces conditions peuvent évoluer ; tu seras prévenu dans l’application en cas de changement important. Elles sont soumises au droit français."
+        ]
+      }
+    ]
+  }
+}

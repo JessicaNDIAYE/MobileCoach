@@ -57,7 +57,8 @@ supabase functions deploy suggest-recipes
 
 ## Ce qui marche déjà
 
-- **Compte** : inscription / connexion par email (session gardée sur le téléphone).
+- **Introduction** : 3 écrans au premier lancement.
+- **Compte** : inscription / connexion par email (session gardée sur le téléphone), suppression du compte depuis l'app.
 - **Profil & poids** : objectif perte, prise ou maintien, poids cible, pesée du jour (une par jour), courbe avec la ligne d'objectif.
 - **Courses & budget** : budget mensuel, jauge avec alerte à 80 % et au dépassement, ajout d'achats (magasin, catégorie, date de péremption), répartition par catégorie, statut « encore au frigo » (servira aux recettes).
 - **Recettes** : au choix, « Mon frigo » (uniquement ce qu'on a + les basiques du placard, rien à acheter) ou « Nouveaux ingrédients » (le frigo en priorité + quelques courses dans le budget). Gemini propose 4 recettes en tenant compte des produits qui périment, du budget restant du mois et des défis en cours. Chaque recette donne ce qu'il reste à acheter avec un prix estimé. « J'ai cuisiné » sort les produits du frigo et ajoute les fibres au défi du jour.
@@ -65,6 +66,43 @@ supabase functions deploy suggest-recipes
   - 🍬 Zéro sucre et 🥖 Low carb : on valide chaque jour « réussi » ou « craqué ».
   - 🥦 Fibres max : on additionne les grammes avec des raccourcis (pomme, avoine…), la journée est validée à 30 g.
   - Code d'invitation partageable, calendrier du défi, série 🔥 et classement entre participants.
+
+## Publication App Store / TestFlight
+
+Déjà dans l'app :
+
+- Écrans d'introduction (premier lancement), politique de confidentialité et CGU lisibles dans l'app.
+- Acceptation des CGU, de la politique et du traitement des données de poids à l'inscription (âge minimum dans `src/content/legal.json`).
+- Consentement avant le premier envoi de données à Gemini (règle App Store 5.1.2).
+- Suppression du compte dans Profil › Compte (règle 5.1.1(v)) : Edge Function `delete-account`, données et photos effacées.
+- Avertissement santé dans les CGU (l'app n'est pas un dispositif médical).
+- `ios.config.usesNonExemptEncryption: false` dans `app.json` : pas de question de chiffrement à chaque build TestFlight.
+
+À faire avant la soumission :
+
+1. Remplir `editor` et `contactEmail` dans `src/content/legal.json`, puis régénérer les pages web :
+   ```bash
+   npm run legal:build
+   ```
+2. Publier le dossier `docs/` (GitHub Pages : Settings › Pages › branche, dossier `/docs`) et renseigner dans App Store Connect :
+   URL de confidentialité → `…/privacy.html`, URL de support → `…/index.html`.
+3. Compte Apple Developer (99 €/an), puis build et envoi avec EAS :
+   ```bash
+   npx eas-cli@latest build --platform ios --profile production
+   ```
+   ```bash
+   npx eas-cli@latest submit --platform ios
+   ```
+4. Fournir à Apple un compte de démonstration (email + mot de passe) avec quelques données.
+5. Questionnaire « Confidentialité de l'app » dans App Store Connect (aucune donnée utilisée pour le suivi publicitaire) :
+
+| Catégorie Apple | Donnée | Liée à l'utilisateur | Usage |
+| --- | --- | --- | --- |
+| Coordonnées › Adresse email | email du compte | oui | fonctionnalité de l'app |
+| Santé et forme › Santé | poids, objectif | oui | fonctionnalité de l'app |
+| Contenu utilisateur › Autre | pseudo, envie saisie pour les recettes | oui | fonctionnalité de l'app |
+| Identifiants › Identifiant utilisateur | id du compte | oui | fonctionnalité de l'app |
+| Autres données | courses, budget, défis | oui | fonctionnalité de l'app |
 
 ## Base de données
 

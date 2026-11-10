@@ -1,6 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 
@@ -29,6 +29,7 @@ type StockItem = { id: string; name: string; expires_on: string | null };
 
 const CACHE_KEY = 'mobilecoach.recipes.last';
 const MODE_KEY = 'mobilecoach.recipes.mode';
+const CONSENT_KEY = 'mobilecoach.recipes.consent';
 
 const MODES: { value: RecipeMode; label: string; hint: string; icon: 'box' | 'shopping-cart' }[] = [
   { value: 'fridge', label: 'Mon frigo', hint: 'Seulement ce que j’ai, rien à acheter', icon: 'box' },
@@ -72,7 +73,28 @@ export default function RecettesScreen() {
     AsyncStorage.setItem(MODE_KEY, m).catch(() => {});
   }
 
+  /** Exigence App Store (5.1.2) : consentement explicite avant d'envoyer des données à un service d'IA tiers. */
   async function suggest() {
+    const consent = await AsyncStorage.getItem(CONSENT_KEY).catch(() => null);
+    if (consent === '1') return runSuggest();
+    Alert.alert(
+      'Avant de commencer',
+      'Pour te proposer des recettes, MobileCoach envoie à Google (service Gemini) les noms et dates de péremption des produits de ton frigo, ton budget restant du mois, le type de tes défis en cours et ton envie. Ton email, ton pseudo et ton poids ne sont jamais envoyés.',
+      [
+        { text: 'Refuser', style: 'cancel' },
+        { text: 'En savoir plus', onPress: () => router.push('/legal/privacy') },
+        {
+          text: 'Accepter',
+          onPress: () => {
+            AsyncStorage.setItem(CONSENT_KEY, '1').catch(() => {});
+            runSuggest();
+          },
+        },
+      ],
+    );
+  }
+
+  async function runSuggest() {
     setLoading(true);
     setError('');
     const { data, error: fnError } = await supabase.functions.invoke<RecipeSuggestions>('suggest-recipes', {
