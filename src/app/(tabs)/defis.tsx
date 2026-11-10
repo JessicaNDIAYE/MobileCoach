@@ -18,14 +18,13 @@ import {
   Tag,
   TextTabs,
   TickGauge,
-  s,
 } from '@/components/ui';
 import { CHALLENGES, FIBER_SHORTCUTS } from '@/lib/catalog';
 import { addDays, daysBetween, fmtDate, today } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 import type { Challenge, ChallengeType, Checkin, LeaderboardRow } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 const DURATIONS = [7, 14, 21, 30];
 
@@ -41,6 +40,7 @@ function computeStreak(checkins: Checkin[], start: string): number {
 }
 
 export default function DefisScreen() {
+  const { colors, s } = useTheme();
   const userId = useUserId();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -140,7 +140,7 @@ export default function DefisScreen() {
   return (
     <Screen title="Défis" subtitle="entre amis">
       {challenges.length > 1 && (
-        <View style={{ paddingHorizontal: 4, marginBottom: 4 }}>
+        <View style={[s.plate, { marginBottom: 4 }]}>
           <TextTabs
             options={challenges.map((c) => ({ value: c.id, label: c.title }))}
             value={selectedId ?? ''}
@@ -174,7 +174,7 @@ export default function DefisScreen() {
                 {i > 0 && <Divider />}
                 <Pressable onPress={() => setNewType(t)} style={[s.listRow, { paddingVertical: 12 }]}>
                   <View style={[s.avatar, active && { backgroundColor: colors.ink }]}>
-                    <Feather name={def.icon} size={18} color={active ? '#fff' : colors.ink} />
+                    <Feather name={def.icon} size={18} color={active ? colors.onInk : colors.ink} />
                   </View>
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={s.bold}>{def.label}</Text>
@@ -218,6 +218,7 @@ type CardProps = {
 };
 
 function ChallengeCard({ challenge: c, mine, board, userId, fiberInput, setFiberInput, onCheckin, onInvite, onLeave }: CardProps) {
+  const { colors, s } = useTheme();
   const def = CHALLENGES[c.type];
   const total = daysBetween(c.starts_on, c.ends_on) + 1;
   const dayIndex = Math.min(daysBetween(c.starts_on, today()) + 1, total);
@@ -233,7 +234,7 @@ function ChallengeCard({ challenge: c, mine, board, userId, fiberInput, setFiber
       <Card>
         <View style={s.rowBetween}>
           <View style={[s.avatar, { backgroundColor: colors.ink }]}>
-            <Feather name={def.icon} size={18} color="#fff" />
+            <Feather name={def.icon} size={18} color={colors.onInk} />
           </View>
           <Row>
             <IconButton name="share" onPress={onInvite} />
@@ -274,7 +275,7 @@ function ChallengeCard({ challenge: c, mine, board, userId, fiberInput, setFiber
                   borderColor: colors.ink,
                 }}
               >
-                <Text style={{ fontSize: 12, fontWeight: '500', color: ck?.success ? '#fff' : missed ? colors.clay : colors.inkSoft }}>{i + 1}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '500', color: ck?.success ? colors.onForest : missed ? colors.clay : colors.inkSoft }}>{i + 1}</Text>
               </View>
             );
           })}

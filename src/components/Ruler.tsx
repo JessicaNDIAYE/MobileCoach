@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { FlatList, StyleSheet, Text, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 
-import { colors, type } from '@/theme';
+import { type, useTheme } from '@/theme';
 
 const STEP = 10; // px entre deux graduations
 const MIN = 30;
@@ -16,6 +16,7 @@ type Props = {
 
 /** Sélecteur de poids : grand chiffre + règle graduée qu'on fait défiler. */
 export function Ruler({ value, onChange, unit = 'kg' }: Props) {
+  const { colors } = useTheme();
   const [width, setWidth] = useState(0);
   const listRef = useRef<FlatList<number>>(null);
   const ticks = useMemo(() => Array.from({ length: Math.round((MAX - MIN) / PRECISION) + 1 }, (_, i) => i), []);
@@ -29,9 +30,9 @@ export function Ruler({ value, onChange, unit = 'kg' }: Props) {
 
   return (
     <View style={{ gap: 14 }} onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}>
-      <Text style={styles.value}>
+      <Text style={[styles.value, { color: colors.ink }]}>
         {value.toFixed(1).replace('.', ',')}
-        <Text style={styles.unit}> {unit}</Text>
+        <Text style={[styles.unit, { color: colors.inkSoft }]}> {unit}</Text>
       </Text>
 
       {width > 0 && (
@@ -56,12 +57,12 @@ export function Ruler({ value, onChange, unit = 'kg' }: Props) {
               const half = item % 5 === 0;
               return (
                 <View style={styles.cell}>
-                  <View style={[styles.tick, { height: major ? 34 : half ? 24 : 16, opacity: major ? 1 : 0.55 }]} />
+                  <View style={[styles.tick, { backgroundColor: colors.muted, height: major ? 34 : half ? 24 : 16, opacity: major ? 1 : 0.55 }]} />
                 </View>
               );
             }}
           />
-          <View pointerEvents="none" style={[styles.cursor, { left: width / 2 - 1.5 }]} />
+          <View pointerEvents="none" style={[styles.cursor, { backgroundColor: colors.ink, left: width / 2 - 1.5 }]} />
         </View>
       )}
     </View>
@@ -71,9 +72,9 @@ export function Ruler({ value, onChange, unit = 'kg' }: Props) {
 const clamp = (v: number) => Math.min(MAX, Math.max(MIN, v || 60));
 
 const styles = StyleSheet.create({
-  value: { ...type.number, fontSize: 72, lineHeight: 76, letterSpacing: -3, textAlign: 'center', color: colors.ink },
-  unit: { fontSize: 18, fontWeight: '500', letterSpacing: 0, color: colors.inkSoft },
+  value: { ...type.number, fontSize: 72, lineHeight: 76, letterSpacing: -3, textAlign: 'center' },
+  unit: { fontSize: 18, fontWeight: '500', letterSpacing: 0 },
   cell: { width: STEP, height: 64, alignItems: 'center', justifyContent: 'center' },
-  tick: { width: 1.5, borderRadius: 1, backgroundColor: colors.muted },
-  cursor: { position: 'absolute', top: 0, width: 3, height: 64, borderRadius: 2, backgroundColor: colors.ink },
+  tick: { width: 1.5, borderRadius: 1 },
+  cursor: { position: 'absolute', top: 0, width: 3, height: 64, borderRadius: 2 },
 });

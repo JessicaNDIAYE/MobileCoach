@@ -4,15 +4,21 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Pressable, Text, View } from 'react-native';
 
-import { Card, CardHeader, Divider, s, type IconName } from '@/components/ui';
+import {
+  Card,
+  CardHeader,
+  Divider,
+  type IconName,
+} from '@/components/ui';
 import { LEGAL_META } from '@/lib/legal';
 import { supabase } from '@/lib/supabase';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Item = { label: string; icon: IconName; onPress: () => void; danger?: boolean; busy?: boolean };
 
 /** Liens légaux, contact, déconnexion et suppression de compte (exigences App Store). */
 export function AccountCard() {
+  const { colors, s } = useTheme();
   const [deleting, setDeleting] = useState(false);
 
   function confirmDelete() {
@@ -42,6 +48,7 @@ export function AccountCard() {
   }
 
   const items: Item[] = [
+    { label: 'Apparence', icon: 'droplet', onPress: () => router.push('/appearance') },
     { label: 'Politique de confidentialité', icon: 'shield', onPress: () => router.push('/legal/privacy') },
     { label: 'Conditions d’utilisation', icon: 'file-text', onPress: () => router.push('/legal/terms') },
     { label: 'Nous contacter', icon: 'mail', onPress: () => Linking.openURL(`mailto:${LEGAL_META.contactEmail}`) },

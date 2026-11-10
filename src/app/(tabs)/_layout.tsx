@@ -2,7 +2,6 @@ import { Tabs } from 'expo-router/js-tabs';
 
 import { TabBar } from '@/components/TabBar';
 import { useModules } from '@/providers/ModulesProvider';
-import { colors } from '@/theme';
 
 export default function TabsLayout() {
   const { has } = useModules();
@@ -12,7 +11,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
-      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.bg } }}
+      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: 'transparent' } }}
     >
       <Tabs.Screen name="index" options={{ title: 'Profil' }} />
       <Tabs.Screen name="courses" options={{ title: 'Courses', ...hide(has('recipes') || has('budget')) }} />

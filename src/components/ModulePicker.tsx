@@ -1,13 +1,14 @@
 import Feather from '@expo/vector-icons/Feather';
 import { Pressable, Text, View } from 'react-native';
 
-import { Divider, Muted, s } from '@/components/ui';
+import { Divider, Muted } from '@/components/ui';
 import { MODULES, WEIGHT_CONSENT } from '@/lib/modules';
 import type { Module } from '@/lib/types';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 /** Liste de modules à cocher. Contrôlée : le parent décide quoi faire de la sélection. */
 export function ModulePicker({ value, onToggle }: { value: Module[]; onToggle: (m: Module) => void }) {
+  const { colors, s } = useTheme();
   return (
     <View style={{ gap: 4 }}>
       {MODULES.map((m, i) => {
@@ -23,7 +24,7 @@ export function ModulePicker({ value, onToggle }: { value: Module[]; onToggle: (
               style={({ pressed }) => [s.listRow, { paddingVertical: 12 }, pressed && s.pressed]}
             >
               <View style={[s.avatar, on && { backgroundColor: colors.ink }]}>
-                <Feather name={m.icon} size={18} color={on ? '#fff' : colors.ink} />
+                <Feather name={m.icon} size={18} color={on ? colors.onInk : colors.ink} />
               </View>
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={s.bold}>{m.label}</Text>

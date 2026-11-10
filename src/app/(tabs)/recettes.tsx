@@ -16,7 +16,6 @@ import {
   Screen,
   Stats,
   Tag,
-  s,
 } from '@/components/ui';
 import { CHALLENGES } from '@/lib/catalog';
 import { daysBetween, eur, monthStart, today } from '@/lib/dates';
@@ -25,7 +24,7 @@ import { supabase } from '@/lib/supabase';
 import type { ChallengeType, RecipeMode, RecipeSuggestions, SuggestedRecipe } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
 import { useModules } from '@/providers/ModulesProvider';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 const GEMINI_CACHE_KEY = 'nutrika.recipes.last';
 const MODE_KEY = 'nutrika.recipes.mode';
@@ -38,6 +37,7 @@ const MODES: { value: RecipeMode; label: string; hint: string; icon: 'box' | 'sh
 ];
 
 export default function RecettesScreen() {
+  const { colors, s } = useTheme();
   const userId = useUserId();
   const { has } = useModules();
   const withBudget = has('budget');
@@ -220,7 +220,7 @@ export default function RecettesScreen() {
         {context.length > 0 && <Stats items={context} />}
       </Card>
 
-      <View style={[s.rowBetween, { paddingHorizontal: 4 }]}>
+      <View style={[s.rowBetween, s.plate]}>
         <Text style={s.cardTitle}>
           {local.length} recette{local.length > 1 ? 's' : ''} pour toi
         </Text>
@@ -266,6 +266,7 @@ export default function RecettesScreen() {
 }
 
 function RecipeCard({ recipe: r, cooked, onCooked }: { recipe: SuggestedRecipe; cooked: boolean; onCooked: () => void }) {
+  const { colors, s } = useTheme();
   const [open, setOpen] = useState(false);
 
   return (

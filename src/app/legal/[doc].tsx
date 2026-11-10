@@ -1,12 +1,18 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from 'react-native';
 
-import { Card, IconButton, Muted, Screen, s } from '@/components/ui';
+import {
+  Card,
+  IconButton,
+  Muted,
+  Screen,
+} from '@/components/ui';
 import { LEGAL_META, getLegalDoc, type LegalDocId } from '@/lib/legal';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 /** Affiche la politique de confidentialité ou les CGU (accessible connecté ou non). */
 export default function LegalScreen() {
+  const { colors, s } = useTheme();
   const { doc } = useLocalSearchParams<{ doc: string }>();
   const id: LegalDocId = doc === 'terms' ? 'terms' : 'privacy';
   const content = getLegalDoc(id);
@@ -19,7 +25,7 @@ export default function LegalScreen() {
       subtitle={last}
       right={<IconButton name="x" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />}
     >
-      <View style={{ paddingHorizontal: 4, gap: 8, marginBottom: 4 }}>
+      <View style={[s.plate, { gap: 8, marginBottom: 4 }]}>
         <Text style={[s.body, { color: colors.inkSoft }]}>{content.intro}</Text>
         <Muted>Mise à jour : {LEGAL_META.updatedAt}</Muted>
       </View>

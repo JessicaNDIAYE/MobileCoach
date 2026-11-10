@@ -19,7 +19,6 @@ import {
   Tag,
   TextTabs,
   TickGauge,
-  s,
 } from '@/components/ui';
 import { CATEGORIES } from '@/lib/catalog';
 import { addDays, eur, fmtDate, monthStart, today } from '@/lib/dates';
@@ -27,7 +26,7 @@ import { supabase } from '@/lib/supabase';
 import type { Purchase } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
 import { useModules } from '@/providers/ModulesProvider';
-import { colors, palette } from '@/theme';
+import { palette, paletteDark, useTheme } from '@/theme';
 
 const EXPIRY = [
   { value: '', label: 'Pas de date' },
@@ -40,6 +39,7 @@ const EXPIRY = [
 const monthName = () => new Date().toLocaleDateString('fr-FR', { month: 'long' });
 
 export default function CoursesScreen() {
+  const { colors, s } = useTheme();
   const userId = useUserId();
   const { has } = useModules();
   const withBudget = has('budget');
@@ -135,7 +135,7 @@ export default function CoursesScreen() {
     purchases.reduce<Record<string, number>>((acc, p) => ({ ...acc, [p.category]: (acc[p.category] ?? 0) + p.price }), {}),
   )
     .sort((a, b) => b[1] - a[1])
-    .map(([label, value]) => ({ label, value, display: eur(value), color: palette[CATEGORIES.indexOf(label as never)] ?? palette[6] }));
+    .map(([label, value]) => ({ label, value, display: eur(value), color: (colors.mode === 'dark' ? paletteDark : palette)[CATEGORIES.indexOf(label as never)] ?? palette[6] }));
 
   return (
     <Screen title="Courses" subtitle={withBudget ? `en ${monthName()}` : 'et ton frigo'}>

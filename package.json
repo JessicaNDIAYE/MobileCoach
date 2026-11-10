@@ -36,7 +36,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
     "legal:build": "node scripts/build-legal-pages.mjs",
-    "recipes:check": "npx --yes tsx scripts/check-recipes.ts"
+    "recipes:check": "npx --yes tsx scripts/check-recipes.ts",
+    "themes:check": "npx --yes tsx scripts/check-themes.ts"
   },
   "private": true
 }

@@ -58,6 +58,7 @@ supabase functions deploy suggest-recipes
 ## Ce qui marche déjà
 
 - **Introduction** : 3 écrans au premier lancement.
+- **Apparence** (Profil › Compte › Apparence) : 5 styles — Épuré (fond uni), Damier, Gribouillis, Topo, Spirale — avec 26 coloris au total, en mode clair, sombre ou automatique (suit le téléphone). Aperçus en direct dans le mode actif. Le texte et les icônes ne sont jamais posés sur un motif (cartes et plaques unies), et `npm run themes:check` vérifie les contrastes WCAG de chaque combinaison (644 contrôles).
 - **Modules au choix** : après l'inscription, chacun compose son app (Recettes, Budget courses, Défis entre amis, Suivi du poids). Le suivi du poids est **désactivé par défaut** (prévention des TCA) ; le désactiver propose de supprimer les pesées. Les onglets, les cartes et les données envoyées à Gemini suivent ces choix. Modifiable dans Profil › Mes modules.
 - **Compte** : inscription / connexion par email (session gardée sur le téléphone), suppression du compte depuis l'app.
 - **Profil & poids** : objectif perte, prise ou maintien, poids cible, pesée du jour (une par jour), courbe avec la ligne d'objectif.
@@ -139,6 +140,10 @@ npm run typecheck
 
 ```bash
 npm run recipes:check
+```
+
+```bash
+npm run themes:check
 ```
 
 `recipes:check` vérifie la base de recettes (ingrédients connus, identifiants uniques) et rejoue des scénarios du moteur. Pour ajouter une recette : une ligne `r(...)` dans `src/content/recipes.ts`, puis relancer ce script.

@@ -19,14 +19,13 @@ import {
   Stats,
   TextTabs,
   TickGauge,
-  s,
 } from '@/components/ui';
 import { fmtDate, today } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 import type { Profile, WeightEntry, WeightMode } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
 import { useModules } from '@/providers/ModulesProvider';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 const MODES: { value: WeightMode; label: string }[] = [
   { value: 'lose', label: 'Perte de poids' },
@@ -38,6 +37,7 @@ const kg = (n: number) => n.toFixed(1).replace('.', ',');
 const longDate = () => new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 
 export default function ProfileScreen() {
+  const { colors, s } = useTheme();
   const userId = useUserId();
   const { width } = useWindowDimensions();
   const { has } = useModules();

@@ -4,12 +4,18 @@ import { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Card, Field, PillButton, Row, s } from '@/components/ui';
+import {
+  Card,
+  Field,
+  PillButton,
+  Row,
+} from '@/components/ui';
 import { LEGAL_META } from '@/lib/legal';
 import { supabase } from '@/lib/supabase';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 export default function Login() {
+  const { colors, s } = useTheme();
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
   const [email, setEmail] = useState('');
@@ -43,9 +49,9 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16, paddingTop: insets.top + 48, paddingBottom: insets.bottom + 16 }}
+      style={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top + 48, paddingBottom: insets.bottom + 16 }}
     >
-      <View style={{ paddingHorizontal: 4, marginBottom: 28 }}>
+      <View style={[s.plate, { marginBottom: 28 }]}>
         <Text style={s.display}>{signUp ? 'Crée ton' : 'Bon retour'}</Text>
         <Text style={[s.display, { color: colors.inkSoft }]}>{signUp ? 'espace coach' : 'parmi nous'}</Text>
         <Text style={[s.muted, { marginTop: 12, fontSize: 15 }]}>Recettes, courses et défis entre amis, à ta façon.</Text>
@@ -75,7 +81,7 @@ export default function Login() {
                 backgroundColor: accepted ? colors.ink : 'transparent',
               }}
             >
-              {accepted && <Feather name="check" size={14} color="#fff" />}
+              {accepted && <Feather name="check" size={14} color={colors.onInk} />}
             </View>
             <Text style={[s.muted, { flex: 1, lineHeight: 19 }]}>
               J’ai {LEGAL_META.minAge} ans ou plus et j’accepte les{' '}
@@ -93,7 +99,7 @@ export default function Login() {
         <PillButton label={signUp ? 'Créer mon compte' : 'Se connecter'} icon="arrow-right" onPress={submit} loading={loading} />
       </Card>
 
-      <Pressable onPress={() => setMode(signUp ? 'signIn' : 'signUp')} style={{ alignItems: 'center', marginTop: 20 }} hitSlop={10}>
+      <Pressable onPress={() => setMode(signUp ? 'signIn' : 'signUp')} style={[s.plate, { alignItems: 'center', marginTop: 20 }]} hitSlop={10}>
         <Text style={s.muted}>
           {signUp ? 'Déjà un compte ? ' : 'Pas encore de compte ? '}
           <Text style={{ color: colors.ink, fontWeight: '600' }}>{signUp ? 'Se connecter' : 'S’inscrire'}</Text>
@@ -101,7 +107,7 @@ export default function Login() {
       </Pressable>
 
       <View style={{ flex: 1 }} />
-      <Row style={{ justifyContent: 'center', gap: 16 }}>
+      <Row style={[s.plate, { justifyContent: 'center', gap: 16 }]}>
         <Pressable onPress={() => router.push('/legal/terms')} hitSlop={8}>
           <Text style={s.muted}>Conditions</Text>
         </Pressable>
