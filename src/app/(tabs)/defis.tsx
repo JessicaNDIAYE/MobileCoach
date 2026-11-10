@@ -103,7 +103,7 @@ export default function DefisScreen() {
   }
 
   function invite(c: Challenge) {
-    Share.share({ message: `Rejoins mon défi « ${c.title} » sur MobileCoach avec le code ${c.invite_code}` });
+    Share.share({ message: `Rejoins mon défi « ${c.title} » sur Nutrika avec le code ${c.invite_code}` });
   }
 
   async function checkin(patch: { success?: boolean; addFiber?: number }) {

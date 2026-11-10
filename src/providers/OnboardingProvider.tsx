@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 
-const KEY = 'mobilecoach.onboarded';
+const KEY = 'nutrika.onboarded';
 
 type OnboardingState = { onboarded: boolean | null; complete: () => void };
 

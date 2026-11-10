@@ -23,13 +23,14 @@ import { daysBetween, eur, today } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 import type { RecipeMode, RecipeSuggestions, SuggestedRecipe } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
+import { useModules } from '@/providers/ModulesProvider';
 import { colors } from '@/theme';
 
 type StockItem = { id: string; name: string; expires_on: string | null };
 
-const CACHE_KEY = 'mobilecoach.recipes.last';
-const MODE_KEY = 'mobilecoach.recipes.mode';
-const CONSENT_KEY = 'mobilecoach.recipes.consent';
+const CACHE_KEY = 'nutrika.recipes.last';
+const MODE_KEY = 'nutrika.recipes.mode';
+const CONSENT_KEY = 'nutrika.recipes.consent';
 
 const MODES: { value: RecipeMode; label: string; hint: string; icon: 'box' | 'shopping-cart' }[] = [
   { value: 'fridge', label: 'Mon frigo', hint: 'Seulement ce que j’ai, rien à acheter', icon: 'box' },
@@ -38,6 +39,7 @@ const MODES: { value: RecipeMode; label: string; hint: string; icon: 'box' | 'sh
 
 export default function RecettesScreen() {
   const userId = useUserId();
+  const { has } = useModules();
   const [stock, setStock] = useState<StockItem[]>([]);
   const [wish, setWish] = useState('');
   const [mode, setMode] = useState<RecipeMode>('fridge');
@@ -79,7 +81,7 @@ export default function RecettesScreen() {
     if (consent === '1') return runSuggest();
     Alert.alert(
       'Avant de commencer',
-      'Pour te proposer des recettes, MobileCoach envoie à Google (service Gemini) les noms et dates de péremption des produits de ton frigo, ton budget restant du mois, le type de tes défis en cours et ton envie. Ton email, ton pseudo et ton poids ne sont jamais envoyés.',
+      'Pour te proposer des recettes, Nutrika envoie à Google (service Gemini) les noms et dates de péremption des produits de ton frigo, ton envie et, si ces modules sont activés, ton budget restant du mois et le type de tes défis en cours. Ton email, ton pseudo et ton poids ne sont jamais envoyés.',
       [
         { text: 'Refuser', style: 'cancel' },
         { text: 'En savoir plus', onPress: () => router.push('/legal/privacy') },
@@ -182,8 +184,10 @@ export default function RecettesScreen() {
         <PillButton label="Proposer des recettes" icon="arrow-right" onPress={suggest} loading={loading} />
         <Muted>
           {mode === 'fridge'
-            ? 'Uniquement tes produits et les basiques du placard, en respectant tes défis.'
-            : 'Ton frigo en priorité, plus quelques achats qui tiennent dans ton budget.'}
+            ? 'Uniquement tes produits et les basiques du placard.'
+            : has('budget')
+              ? 'Ton frigo en priorité, plus quelques achats qui tiennent dans ton budget.'
+              : 'Ton frigo en priorité, plus quelques achats.'}
         </Muted>
         {error !== '' && (
           <Row>
@@ -198,7 +202,7 @@ export default function RecettesScreen() {
           <Stats
             items={[
               ['Mode', result.mode === 'shopping' ? 'nouveaux ingrédients' : 'mon frigo'],
-              ['Budget restant', result.remaining_budget === null ? 'non défini' : eur(result.remaining_budget)],
+              ...(result.remaining_budget !== null ? ([['Budget restant', eur(result.remaining_budget)]] as [string, string][]) : []),
               ...(result.challenges.length ? ([['Défi', result.challenges.map((c) => CHALLENGES[c].label).join(', ')]] as [string, string][]) : []),
             ]}
           />

@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
   const today = todayISO();
   const monthStart = `${today.slice(0, 7)}-01`;
   const [profileRes, stockRes, monthRes, challengesRes] = await Promise.all([
-    supabase.from('profiles').select('monthly_budget').eq('id', auth.user.id).single(),
+    supabase.from('profiles').select('monthly_budget, modules').eq('id', auth.user.id).single(),
     supabase.from('purchases').select('id, name, expires_on').eq('in_stock', true).order('expires_on', { ascending: true, nullsFirst: false }).limit(60),
     supabase.from('purchases').select('price').gte('purchased_on', monthStart),
     supabase.from('challenges').select('type').lte('starts_on', today).gte('ends_on', today),
@@ -91,10 +91,17 @@ Deno.serve(async (req) => {
     return json({ error: 'Ton frigo est vide : ajoute des achats dans Courses ou choisis « Nouveaux ingrédients ».' }, 400);
   }
 
-  const budget = Number(profileRes.data?.monthly_budget ?? 0);
+  // Modules désactivés par l'utilisateur : leurs données ne sont ni utilisées ni envoyées à Gemini.
+  const modules: string[] | null = profileRes.data?.modules ?? null;
+  const useBudget = !modules || modules.includes('budget');
+  const useChallenges = !modules || modules.includes('challenges');
+
+  const budget = useBudget ? Number(profileRes.data?.monthly_budget ?? 0) : 0;
   const spent = (monthRes.data ?? []).reduce((t, p) => t + Number(p.price), 0);
   const remaining = budget > 0 ? Math.round(Math.max(budget - spent, 0) * 100) / 100 : null;
-  const challengeTypes = [...new Set((challengesRes.data ?? []).map((c) => c.type as string))].filter((t) => t in CHALLENGE_RULES);
+  const challengeTypes = useChallenges
+    ? [...new Set((challengesRes.data ?? []).map((c) => c.type as string))].filter((t) => t in CHALLENGE_RULES)
+    : [];
 
   const stockLines = stock
     .map((p, i) => {

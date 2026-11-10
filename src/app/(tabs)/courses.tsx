@@ -26,6 +26,7 @@ import { addDays, eur, fmtDate, monthStart, today } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 import type { Purchase } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
+import { useModules } from '@/providers/ModulesProvider';
 import { colors, palette } from '@/theme';
 
 const EXPIRY = [
@@ -40,6 +41,8 @@ const monthName = () => new Date().toLocaleDateString('fr-FR', { month: 'long' }
 
 export default function CoursesScreen() {
   const userId = useUserId();
+  const { has } = useModules();
+  const withBudget = has('budget');
   const [budget, setBudget] = useState(0);
   const [editingBudget, setEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
@@ -83,9 +86,10 @@ export default function CoursesScreen() {
   }
 
   async function addPurchase() {
-    const value = Number(price.replace(',', '.'));
-    if (!name.trim() || price === '' || !(value >= 0)) {
-      Alert.alert('Presque', 'Indique au moins l’article et son prix.');
+    // Sans le module Budget, le prix n'est pas demandé.
+    const value = withBudget ? Number(price.replace(',', '.')) : 0;
+    if (!name.trim() || (withBudget && (price === '' || !(value >= 0)))) {
+      Alert.alert('Presque', withBudget ? 'Indique au moins l’article et son prix.' : 'Indique le nom de l’article.');
       return;
     }
     setSaving(true);
@@ -134,47 +138,49 @@ export default function CoursesScreen() {
     .map(([label, value]) => ({ label, value, display: eur(value), color: palette[CATEGORIES.indexOf(label as never)] ?? palette[6] }));
 
   return (
-    <Screen title="Courses" subtitle={`en ${monthName()}`}>
-      <Card>
-        <CardHeader
-          title="Budget"
-          right={<IconButton name={editingBudget ? 'x' : 'edit-2'} onPress={() => setEditingBudget((v) => !v)} />}
-        />
-        <Row style={{ alignItems: 'baseline' }}>
-          <BigNumber value={eur(spent)} />
-          {budget > 0 && <Muted>/ {eur(budget)}</Muted>}
-        </Row>
-        {budget > 0 ? (
-          <>
-            <TickGauge ratio={ratio} color={gaugeColor} />
-            <Stats
-              items={[
-                ['Reste', eur(Math.max(budget - spent, 0))],
-                ['Utilisé', `${Math.round(ratio * 100)} %`],
-                ['Achats', String(purchases.length)],
-              ]}
-            />
-            {ratio >= 0.8 && (
-              <Row>
-                <Feather name="alert-circle" size={15} color={ratio >= 1 ? colors.rust : colors.clay} />
-                <Text style={[s.muted, { color: ratio >= 1 ? colors.rust : colors.clay }]}>
-                  {ratio >= 1 ? `Budget dépassé de ${eur(spent - budget)}` : 'Plus que 20 % du budget disponible'}
-                </Text>
-              </Row>
-            )}
-          </>
-        ) : (
-          !editingBudget && <Muted>Fixe un budget mensuel pour suivre tes dépenses.</Muted>
-        )}
-        {(editingBudget || budget === 0) && (
-          <Row>
-            <Field placeholder="Budget mensuel en €" keyboardType="decimal-pad" value={budgetInput} onChangeText={setBudgetInput} />
-            <IconButton name="check" dark onPress={saveBudget} />
+    <Screen title="Courses" subtitle={withBudget ? `en ${monthName()}` : 'et ton frigo'}>
+      {withBudget && (
+        <Card>
+          <CardHeader
+            title="Budget"
+            right={<IconButton name={editingBudget ? 'x' : 'edit-2'} onPress={() => setEditingBudget((v) => !v)} />}
+          />
+          <Row style={{ alignItems: 'baseline' }}>
+            <BigNumber value={eur(spent)} />
+            {budget > 0 && <Muted>/ {eur(budget)}</Muted>}
           </Row>
-        )}
-      </Card>
+          {budget > 0 ? (
+            <>
+              <TickGauge ratio={ratio} color={gaugeColor} />
+              <Stats
+                items={[
+                  ['Reste', eur(Math.max(budget - spent, 0))],
+                  ['Utilisé', `${Math.round(ratio * 100)} %`],
+                  ['Achats', String(purchases.length)],
+                ]}
+              />
+              {ratio >= 0.8 && (
+                <Row>
+                  <Feather name="alert-circle" size={15} color={ratio >= 1 ? colors.rust : colors.clay} />
+                  <Text style={[s.muted, { color: ratio >= 1 ? colors.rust : colors.clay }]}>
+                    {ratio >= 1 ? `Budget dépassé de ${eur(spent - budget)}` : 'Plus que 20 % du budget disponible'}
+                  </Text>
+                </Row>
+              )}
+            </>
+          ) : (
+            !editingBudget && <Muted>Fixe un budget mensuel pour suivre tes dépenses.</Muted>
+          )}
+          {(editingBudget || budget === 0) && (
+            <Row>
+              <Field placeholder="Budget mensuel en €" keyboardType="decimal-pad" value={budgetInput} onChangeText={setBudgetInput} />
+              <IconButton name="check" dark onPress={saveBudget} />
+            </Row>
+          )}
+        </Card>
+      )}
 
-      {byCategory.length > 0 && (
+      {withBudget && byCategory.length > 0 && (
         <Card>
           <CardHeader title="Répartition" right={<Muted>{byCategory.length} catégories</Muted>} />
           <SegmentBar items={byCategory} />
@@ -185,7 +191,9 @@ export default function CoursesScreen() {
         <CardHeader title="Nouvel achat" />
         <Field placeholder="Article, ex. tomates" value={name} onChangeText={setName} />
         <Row>
-          <Field placeholder="Prix €" keyboardType="decimal-pad" value={price} onChangeText={setPrice} style={{ flex: 1 }} />
+          {withBudget && (
+            <Field placeholder="Prix €" keyboardType="decimal-pad" value={price} onChangeText={setPrice} style={{ flex: 1 }} />
+          )}
           <Field placeholder="Magasin" value={store} onChangeText={setStore} style={{ flex: 1.4 }} />
         </Row>
         <TextTabs options={CATEGORIES.map((c) => ({ value: c, label: c }))} value={category} onChange={setCategory} />
@@ -201,7 +209,7 @@ export default function CoursesScreen() {
       </Card>
 
       <Card style={{ gap: 12 }}>
-        <CardHeader title="Achats du mois" />
+        <CardHeader title={withBudget ? 'Achats du mois' : 'Tes produits'} />
         {purchases.length === 0 && <Muted>Aucun achat pour l’instant.</Muted>}
         {purchases.map((p, i) => (
           <View key={p.id} style={{ gap: 12 }}>
@@ -213,14 +221,14 @@ export default function CoursesScreen() {
                   {[p.store ?? fmtDate(p.purchased_on), p.expires_on && `jusqu’au ${fmtDate(p.expires_on)}`].filter(Boolean).join(' · ')}
                 </Muted>
               </View>
-              <Text style={s.bold}>{eur(p.price)}</Text>
+              {withBudget && <Text style={s.bold}>{eur(p.price)}</Text>}
               <Pressable onPress={() => toggleStock(p)} hitSlop={10} accessibilityLabel={p.in_stock ? 'Marquer comme utilisé' : 'Remettre au frigo'}>
                 <Feather name={p.in_stock ? 'circle' : 'check-circle'} size={20} color={p.in_stock ? colors.muted : colors.forest} />
               </Pressable>
             </Pressable>
           </View>
         ))}
-        {purchases.length > 0 && <Muted>Coche un article une fois utilisé · appui long pour le supprimer.</Muted>}
+        {purchases.length > 0 && <Muted>Touche le rond quand un produit est fini · appui long pour le supprimer.</Muted>}
       </Card>
     </Screen>
   );

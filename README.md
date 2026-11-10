@@ -1,4 +1,4 @@
-# MobileCoach 🥗
+# Nutrika
 
 App iOS (Expo) pour suivre son **poids**, son **budget courses**, trouver des **recettes avec ce qu'il reste au frigo** et faire des **défis entre amis** (zéro sucre, low carb, fibres max).
 
@@ -58,6 +58,7 @@ supabase functions deploy suggest-recipes
 ## Ce qui marche déjà
 
 - **Introduction** : 3 écrans au premier lancement.
+- **Modules au choix** : après l'inscription, chacun compose son app (Recettes, Budget courses, Défis entre amis, Suivi du poids). Le suivi du poids est **désactivé par défaut** (prévention des TCA) ; le désactiver propose de supprimer les pesées. Les onglets, les cartes et les données envoyées à Gemini suivent ces choix. Modifiable dans Profil › Mes modules.
 - **Compte** : inscription / connexion par email (session gardée sur le téléphone), suppression du compte depuis l'app.
 - **Profil & poids** : objectif perte, prise ou maintien, poids cible, pesée du jour (une par jour), courbe avec la ligne d'objectif.
 - **Courses & budget** : budget mensuel, jauge avec alerte à 80 % et au dépassement, ajout d'achats (magasin, catégorie, date de péremption), répartition par catégorie, statut « encore au frigo » (servira aux recettes).
@@ -108,7 +109,7 @@ Déjà dans l'app :
 
 | Table | Rôle |
 | --- | --- |
-| `profiles` | pseudo, budget mensuel, objectif de poids (créé automatiquement à l'inscription) |
+| `profiles` | pseudo, budget mensuel, objectif de poids, modules choisis (créé automatiquement à l'inscription) |
 | `weight_entries` | pesées (1 par jour) |
 | `receipts` / `purchases` | tickets de caisse (OCR) et articles achetés |
 | `promos` | promos repérées |

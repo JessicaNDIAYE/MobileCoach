@@ -1,6 +1,6 @@
 {
   "meta": {
-    "appName": "MobileCoach",
+    "appName": "Nutrika",
     "editor": "[NOM DE L'ÉDITEUR]",
     "contactEmail": "[EMAIL DE CONTACT]",
     "minAge": 18,
@@ -20,10 +20,11 @@
         "title": "Données collectées",
         "bullets": [
           "Compte : adresse email, pseudo et mot de passe (stocké sous forme chiffrée, jamais lisible).",
-          "Santé : tes pesées, ton objectif de poids et le type d’objectif (perte, prise, maintien).",
+          "Santé, uniquement si tu actives le module Suivi du poids : tes pesées, ton objectif de poids et le type d’objectif (perte, prise, maintien).",
           "Courses : articles achetés, prix, magasins, catégories, dates d’achat et de péremption, budget mensuel.",
           "Défis : défis créés ou rejoints, validations quotidiennes et grammes de fibres saisis.",
-          "Recettes : l’envie que tu saisis et le mode choisi lorsque tu demandes des recettes."
+          "Recettes : l’envie que tu saisis et le mode choisi lorsque tu demandes des recettes.",
+          "Préférences : les modules que tu as choisis d’afficher dans l’application."
         ],
         "paragraphs": [
           "{{app}} n’utilise aucun outil de publicité ni de suivi publicitaire, et ne revend aucune donnée."
@@ -42,7 +43,7 @@
         "title": "Base légale",
         "paragraphs": [
           "Le traitement repose sur l’exécution du service que tu as demandé en créant ton compte (CGU).",
-          "Tes données de poids sont des données de santé : elles ne sont traitées qu’avec ton consentement explicite, donné lorsque tu acceptes ces conditions et que tu enregistres une pesée. Tu peux le retirer à tout moment en supprimant tes pesées ou ton compte.",
+          "Tes données de poids sont des données de santé. Le suivi du poids est désactivé par défaut : elles ne sont traitées qu’avec ton consentement explicite, donné en activant ce module. Tu peux le retirer à tout moment en désactivant le module (avec suppression de tes pesées) ou en supprimant ton compte.",
           "L’envoi de données au service de recettes repose sur ton consentement, demandé avant la première utilisation."
         ]
       },
@@ -50,7 +51,7 @@
         "title": "Avec qui elles sont partagées",
         "bullets": [
           "Supabase (hébergement de la base de données et de l’authentification) : stocke l’ensemble des données de ton compte.",
-          "Google (API Gemini), uniquement quand tu demandes des recettes : reçoit les noms des produits de ton frigo, leurs dates de péremption, ton budget restant du mois, le type de tes défis en cours et l’envie que tu as saisie. Ton email, ton pseudo et ton poids ne sont jamais envoyés.",
+          "Google (API Gemini), uniquement quand tu demandes des recettes : reçoit les noms des produits de ton frigo, leurs dates de péremption et l’envie que tu as saisie, ainsi que ton budget restant du mois et le type de tes défis en cours si ces modules sont activés. Ton email, ton pseudo et ton poids ne sont jamais envoyés.",
           "Tes amis : dans un défi partagé, les autres participants voient ton pseudo, tes jours réussis et, pour le défi fibres, ton total de fibres. Ils ne voient ni ton poids, ni tes courses, ni ton budget."
         ],
         "paragraphs": [
@@ -97,7 +98,8 @@
       {
         "title": "Le service",
         "paragraphs": [
-          "{{app}} est une application gratuite qui t’aide à suivre ton poids et ton budget courses, à trouver des recettes et à relever des défis alimentaires avec tes amis. Elle est éditée par {{editor}}."
+          "{{app}} est une application gratuite qui t’aide à suivre ton poids et ton budget courses, à trouver des recettes et à relever des défis alimentaires avec tes amis. Elle est éditée par {{editor}}.",
+          "L’application est modulaire : tu choisis les fonctionnalités que tu veux utiliser (recettes, budget, défis, suivi du poids) et tu peux les modifier à tout moment depuis ton profil. Le suivi du poids n’est jamais activé sans ton choix."
         ]
       },
       {

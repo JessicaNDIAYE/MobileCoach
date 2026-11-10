@@ -4,6 +4,7 @@ import { Alert, Text, View, useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 
 import { AccountCard } from '@/components/AccountCard';
+import { ModulesCard } from '@/components/ModulesCard';
 import { Ruler } from '@/components/Ruler';
 import {
   BigNumber,
@@ -24,6 +25,7 @@ import { fmtDate, today } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 import type { Profile, WeightEntry, WeightMode } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
+import { useModules } from '@/providers/ModulesProvider';
 import { colors } from '@/theme';
 
 const MODES: { value: WeightMode; label: string }[] = [
@@ -38,6 +40,8 @@ const longDate = () => new Date().toLocaleDateString('fr-FR', { day: 'numeric', 
 export default function ProfileScreen() {
   const userId = useUserId();
   const { width } = useWindowDimensions();
+  const { has } = useModules();
+  const showWeight = has('weight');
   const [profile, setProfile] = useState<Profile | null>(null);
   const [entries, setEntries] = useState<WeightEntry[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -47,14 +51,17 @@ export default function ProfileScreen() {
   const load = useCallback(async () => {
     const [p, w] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).single(),
-      supabase.from('weight_entries').select('id, measured_on, weight_kg').order('measured_on').limit(60),
+      // Les pesées ne sont lues que si le suivi du poids est activé.
+      showWeight
+        ? supabase.from('weight_entries').select('id, measured_on, weight_kg').order('measured_on').limit(60)
+        : Promise.resolve({ data: [] as WeightEntry[] }),
     ]);
     const list: WeightEntry[] = (w.data ?? []).map((e) => ({ ...e, weight_kg: Number(e.weight_kg) }));
     if (p.data) setProfile({ ...p.data, weight_goal_kg: p.data.weight_goal_kg != null ? Number(p.data.weight_goal_kg) : null });
     setEntries(list);
     if (!loaded) setPicked(list.at(-1)?.weight_kg ?? 60);
     setLoaded(true);
-  }, [userId, loaded]);
+  }, [userId, loaded, showWeight]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -93,83 +100,88 @@ export default function ProfileScreen() {
     <Screen
       eyebrow="Aujourd’hui"
       title={longDate()}
-      subtitle={profile?.username ? `Salut ${profile.username}` : 'Ton poids'}
+      subtitle={profile?.username ? `Salut ${profile.username}` : 'Ton profil'}
       right={<IconButton name="log-out" onPress={() => supabase.auth.signOut()} />}
     >
-      <Card>
-        <CardHeader title="Poids" right={<Muted>{entries.length ? fmtDate(entries.at(-1)!.measured_on) : '—'}</Muted>} />
-        {last != null ? (
-          <>
-            <Row style={{ alignItems: 'baseline' }}>
-              <BigNumber value={kg(last)} />
-              {target != null && <Muted>{kg(target)} kg visés</Muted>}
-            </Row>
-            <TickGauge ratio={progress} />
-            <Stats
-              items={[
-                ['Départ', first != null ? kg(first) : '—'],
-                ['Écart', first != null ? `${last - first > 0 ? '+' : ''}${kg(last - first)}` : '—'],
-                ['Reste', remaining != null ? kg(remaining) : '—'],
-              ]}
-            />
-          </>
-        ) : (
-          <Muted>Aucune pesée pour l’instant. Fais glisser la règle ci-dessous pour enregistrer la première.</Muted>
-        )}
-      </Card>
+      {showWeight && (
+        <>
+          <Card>
+            <CardHeader title="Poids" right={<Muted>{entries.length ? fmtDate(entries.at(-1)!.measured_on) : '—'}</Muted>} />
+            {last != null ? (
+              <>
+                <Row style={{ alignItems: 'baseline' }}>
+                  <BigNumber value={kg(last)} />
+                  {target != null && <Muted>{kg(target)} kg visés</Muted>}
+                </Row>
+                <TickGauge ratio={progress} />
+                <Stats
+                  items={[
+                    ['Départ', first != null ? kg(first) : '—'],
+                    ['Écart', first != null ? `${last - first > 0 ? '+' : ''}${kg(last - first)}` : '—'],
+                    ['Reste', remaining != null ? kg(remaining) : '—'],
+                  ]}
+                />
+              </>
+            ) : (
+              <Muted>Aucune pesée pour l’instant. Fais glisser la règle ci-dessous pour enregistrer la première.</Muted>
+            )}
+          </Card>
 
-      <Card>
-        <CardHeader title="Nouvelle pesée" right={<Muted>{fmtDate(today())}</Muted>} />
-        {loaded && <Ruler key={String(loaded)} value={picked} onChange={setPicked} />}
-        <PillButton label="Enregistrer la pesée" icon="arrow-right" onPress={saveWeight} loading={saving} />
-        <PillButton label="Définir comme objectif" variant="light" onPress={() => updateProfile({ weight_goal_kg: picked })} />
-      </Card>
+          <Card>
+            <CardHeader title="Nouvelle pesée" right={<Muted>{fmtDate(today())}</Muted>} />
+            {loaded && <Ruler key={String(loaded)} value={picked} onChange={setPicked} />}
+            <PillButton label="Enregistrer la pesée" icon="arrow-right" onPress={saveWeight} loading={saving} />
+            <PillButton label="Définir comme objectif" variant="light" onPress={() => updateProfile({ weight_goal_kg: picked })} />
+          </Card>
 
-      <Card>
-        <CardHeader title="Objectif" />
-        <TextTabs options={MODES} value={profile?.weight_mode ?? 'lose'} onChange={(m) => updateProfile({ weight_mode: m })} />
-      </Card>
+          <Card>
+            <CardHeader title="Objectif" />
+            <TextTabs options={MODES} value={profile?.weight_mode ?? 'lose'} onChange={(m) => updateProfile({ weight_mode: m })} />
+          </Card>
 
-      {entries.length >= 2 && (
-        <Card>
-          <CardHeader title="Évolution" right={<Muted>{entries.length} pesées</Muted>} />
-          <LineChart
-            data={entries.map((e) => ({ value: e.weight_kg - floor }))}
-            formatYLabel={(v) => String(Math.round(Number(v) + floor))}
-            width={width - 112}
-            height={160}
-            adjustToWidth
-            curved
-            hideDataPoints
-            color={colors.forest}
-            thickness={2}
-            hideRules
-            yAxisColor="transparent"
-            xAxisColor={colors.line}
-            yAxisTextStyle={{ color: colors.inkSoft, fontSize: 11 }}
-            noOfSections={4}
-            showReferenceLine1={target != null}
-            referenceLine1Position={target != null ? target - floor : 0}
-            referenceLine1Config={{ color: colors.clay, dashWidth: 3, dashGap: 5, thickness: 1 }}
-          />
-        </Card>
+          {entries.length >= 2 && (
+            <Card>
+              <CardHeader title="Évolution" right={<Muted>{entries.length} pesées</Muted>} />
+              <LineChart
+                data={entries.map((e) => ({ value: e.weight_kg - floor }))}
+                formatYLabel={(v) => String(Math.round(Number(v) + floor))}
+                width={width - 112}
+                height={160}
+                adjustToWidth
+                curved
+                hideDataPoints
+                color={colors.forest}
+                thickness={2}
+                hideRules
+                yAxisColor="transparent"
+                xAxisColor={colors.line}
+                yAxisTextStyle={{ color: colors.inkSoft, fontSize: 11 }}
+                noOfSections={4}
+                showReferenceLine1={target != null}
+                referenceLine1Position={target != null ? target - floor : 0}
+                referenceLine1Config={{ color: colors.clay, dashWidth: 3, dashGap: 5, thickness: 1 }}
+              />
+            </Card>
+          )}
+
+          {entries.length > 0 && (
+            <Card style={{ gap: 12 }}>
+              <CardHeader title="Historique" />
+              {[...entries].reverse().slice(0, 6).map((e, i) => (
+                <View key={e.id} style={{ gap: 12 }}>
+                  {i > 0 && <Divider />}
+                  <View style={s.rowBetween}>
+                    <Text style={s.body}>{fmtDate(e.measured_on)}</Text>
+                    <Text style={s.bold}>{kg(e.weight_kg)} kg</Text>
+                  </View>
+                </View>
+              ))}
+            </Card>
+          )}
+        </>
       )}
 
-      {entries.length > 0 && (
-        <Card style={{ gap: 12 }}>
-          <CardHeader title="Historique" />
-          {[...entries].reverse().slice(0, 6).map((e, i) => (
-            <View key={e.id} style={{ gap: 12 }}>
-              {i > 0 && <Divider />}
-              <View style={s.rowBetween}>
-                <Text style={s.body}>{fmtDate(e.measured_on)}</Text>
-                <Text style={s.bold}>{kg(e.weight_kg)} kg</Text>
-              </View>
-            </View>
-          ))}
-        </Card>
-      )}
-
+      <ModulesCard />
       <AccountCard />
     </Screen>
   );

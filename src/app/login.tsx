@@ -48,7 +48,7 @@ export default function Login() {
       <View style={{ paddingHorizontal: 4, marginBottom: 28 }}>
         <Text style={s.display}>{signUp ? 'Crée ton' : 'Bon retour'}</Text>
         <Text style={[s.display, { color: colors.inkSoft }]}>{signUp ? 'espace coach' : 'parmi nous'}</Text>
-        <Text style={[s.muted, { marginTop: 12, fontSize: 15 }]}>Poids, courses et défis entre amis, au même endroit.</Text>
+        <Text style={[s.muted, { marginTop: 12, fontSize: 15 }]}>Recettes, courses et défis entre amis, à ta façon.</Text>
       </View>
 
       <Card>
@@ -86,7 +86,7 @@ export default function Login() {
               <Text style={{ color: colors.ink, fontWeight: '600' }} onPress={() => router.push('/legal/privacy')}>
                 politique de confidentialité
               </Text>
-              , y compris le traitement de mes données de poids.
+              .
             </Text>
           </Pressable>
         )}

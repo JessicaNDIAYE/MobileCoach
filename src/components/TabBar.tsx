@@ -3,10 +3,11 @@ import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { IconName } from '@/components/ui';
+import { useModules } from '@/providers/ModulesProvider';
 import { colors } from '@/theme';
 
 const TABS: Record<string, { label: string; icon: IconName }> = {
-  index: { label: 'Profil', icon: 'activity' },
+  index: { label: 'Profil', icon: 'user' },
   courses: { label: 'Courses', icon: 'shopping-bag' },
   recettes: { label: 'Recettes', icon: 'book-open' },
   defis: { label: 'Défis', icon: 'award' },
@@ -14,12 +15,20 @@ const TABS: Record<string, { label: string; icon: IconName }> = {
 
 /** Barre d'onglets flottante : l'onglet actif s'ouvre en pilule avec son libellé. */
 export function TabBar({ state, navigateToTab, insets }: BottomTabBarProps) {
+  const { has } = useModules();
+  const visible: Record<string, boolean> = {
+    index: true,
+    courses: has('recipes') || has('budget'),
+    recettes: has('recipes'),
+    defis: has('challenges'),
+  };
+
   return (
     <View style={[styles.wrap, { bottom: Math.max(insets.bottom, 12) }]}>
       <View style={styles.bar}>
         {state.routes.map((route, i) => {
           const tab = TABS[route.name];
-          if (!tab) return null;
+          if (!tab || !visible[route.name]) return null;
           const active = state.index === i;
           return (
             <Pressable

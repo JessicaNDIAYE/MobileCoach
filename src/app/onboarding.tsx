@@ -3,35 +3,25 @@ import { useRef, useState, type ReactNode } from 'react';
 import { FlatList, Pressable, Text, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BigNumber, Card, Muted, PillButton, Row, Stats, Tag, TickGauge, s } from '@/components/ui';
+import { Card, Muted, PillButton, Row, Stats, Tag, s } from '@/components/ui';
 import { useOnboarding } from '@/providers/OnboardingProvider';
 import { colors } from '@/theme';
 
 type Slide = { key: string; title: string; subtitle: string; text: string; preview: ReactNode };
 
+const PREVIEW_MODULES: { label: string; icon: 'book-open' | 'shopping-bag' | 'award' | 'activity'; on: boolean }[] = [
+  { label: 'Recettes', icon: 'book-open', on: true },
+  { label: 'Budget courses', icon: 'shopping-bag', on: true },
+  { label: 'Défis entre amis', icon: 'award', on: true },
+  { label: 'Suivi du poids', icon: 'activity', on: false },
+];
+
 const SLIDES: Slide[] = [
   {
-    key: 'weight',
-    title: 'Ton poids,',
-    subtitle: 'sans prise de tête',
-    text: 'Une pesée par jour, un objectif clair et une courbe pour voir le chemin parcouru.',
-    preview: (
-      <Card>
-        <Row style={{ justifyContent: 'space-between' }}>
-          <Text style={s.cardTitle}>Poids</Text>
-          <Muted>Aujourd’hui</Muted>
-        </Row>
-        <BigNumber value="64,1" unit="kg" />
-        <TickGauge ratio={0.55} count={26} />
-        <Stats items={[['Départ', '66,4'], ['Reste', '2,1']]} />
-      </Card>
-    ),
-  },
-  {
     key: 'food',
-    title: 'Tes courses,',
-    subtitle: 'tes recettes',
-    text: 'Suis ton budget du mois et trouve quoi cuisiner avec ce qu’il reste dans ton frigo.',
+    title: 'Cuisine avec',
+    subtitle: 'ce que tu as',
+    text: 'Note tes courses, garde un œil sur ce qui périme et trouve quoi cuisiner avec ton frigo.',
     preview: (
       <Card>
         <Row style={{ justifyContent: 'space-between' }}>
@@ -43,7 +33,7 @@ const SLIDES: Slide[] = [
             <Tag key={t} label={t} />
           ))}
         </View>
-        <Stats items={[['Budget restant', '86,40 €']]} />
+        <Stats items={[['Temps', '25 min'], ['Portions', '2']]} />
       </Card>
     ),
   },
@@ -65,14 +55,33 @@ const SLIDES: Slide[] = [
                 borderRadius: 10,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: i < 6 ? colors.forest : i === 6 ? colors.clayLight : colors.soft,
+                backgroundColor: i < 6 ? colors.forest : colors.soft,
               }}
             >
               <Text style={{ fontSize: 11, color: i < 6 ? '#fff' : colors.inkSoft }}>{i + 1}</Text>
             </View>
           ))}
         </View>
-        <Stats items={[['Série', '6 j'], ['Classement', '1er']]} />
+        <Stats items={[['Série', '6 j'], ['Amis', '3']]} />
+      </Card>
+    ),
+  },
+  {
+    key: 'modules',
+    title: 'Ton app,',
+    subtitle: 'à ta façon',
+    text: 'Tu choisis ce que tu veux voir. Rien n’est imposé, et tout se change à tout moment dans ton profil.',
+    preview: (
+      <Card style={{ gap: 14 }}>
+        {PREVIEW_MODULES.map((m) => (
+          <Row key={m.label} style={{ gap: 12 }}>
+            <View style={[s.avatar, m.on && { backgroundColor: colors.ink }]}>
+              <Feather name={m.icon} size={18} color={m.on ? '#fff' : colors.ink} />
+            </View>
+            <Text style={[s.bold, { flex: 1 }]}>{m.label}</Text>
+            <Feather name={m.on ? 'check-circle' : 'circle'} size={20} color={m.on ? colors.ink : colors.muted} />
+          </Row>
+        ))}
       </Card>
     ),
   },

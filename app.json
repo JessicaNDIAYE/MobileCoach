@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "MobileCoach",
-    "slug": "mobilecoach",
+    "name": "Nutrika",
+    "slug": "nutrika",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jessicandiaye.mobilecoach",
+      "bundleIdentifier": "com.jessicandiaye.nutrika",
       "buildNumber": "1",
       "config": {
         "usesNonExemptEncryption": false
@@ -22,7 +22,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.jessicandiaye.mobilecoach"
+      "package": "com.jessicandiaye.nutrika"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,12 +32,12 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "MobileCoach accède à tes photos pour enregistrer tes plats et tickets de caisse.",
-          "cameraPermission": "MobileCoach utilise l'appareil photo pour scanner tes tickets et photographier tes plats."
+          "photosPermission": "Nutrika accède à tes photos pour enregistrer tes plats et tickets de caisse.",
+          "cameraPermission": "Nutrika utilise l'appareil photo pour scanner tes tickets et photographier tes plats."
         }
       ]
     ],
-    "scheme": "mobilecoach",
+    "scheme": "nutrika",
     "experiments": {
       "typedRoutes": true
     }

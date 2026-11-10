@@ -1,5 +1,6 @@
 export type WeightMode = 'lose' | 'gain' | 'keep';
 export type ChallengeType = 'no_sugar' | 'no_carbs' | 'fiber_max';
+export type Module = 'recipes' | 'budget' | 'weight' | 'challenges';
 
 export type Profile = {
   id: string;
@@ -7,6 +8,7 @@ export type Profile = {
   monthly_budget: number;
   weight_mode: WeightMode;
   weight_goal_kg: number | null;
+  modules: Module[] | null;
 };
 
 export type WeightEntry = { id: string; measured_on: string; weight_kg: number };

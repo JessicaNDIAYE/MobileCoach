@@ -36,7 +36,7 @@ export function AccountCard() {
     }
     // Nettoie les données gardées sur le téléphone, puis déconnecte (retour à l'écran de connexion).
     const keys = await AsyncStorage.getAllKeys().catch(() => [] as readonly string[]);
-    await AsyncStorage.multiRemove(keys.filter((k) => k.startsWith('mobilecoach.recipes'))).catch(() => {});
+    await AsyncStorage.multiRemove(keys.filter((k) => k.startsWith('nutrika.recipes'))).catch(() => {});
     await supabase.auth.signOut({ scope: 'local' });
     Alert.alert('Compte supprimé', 'Toutes tes données ont été effacées.');
   }
