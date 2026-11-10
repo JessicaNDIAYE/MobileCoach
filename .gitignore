@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Deno (Edge Functions)
+supabase/functions/**/deno.lock
