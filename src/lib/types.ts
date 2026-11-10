@@ -58,7 +58,10 @@ export type SuggestedRecipe = {
   steps: string[];
 };
 
+export type RecipeMode = 'fridge' | 'shopping';
+
 export type RecipeSuggestions = {
+  mode: RecipeMode;
   recipes: SuggestedRecipe[];
   remaining_budget: number | null;
   challenges: ChallengeType[];

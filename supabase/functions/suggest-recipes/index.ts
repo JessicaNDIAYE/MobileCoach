@@ -73,6 +73,8 @@ Deno.serve(async (req) => {
 
   const body = await req.json().catch(() => ({}));
   const wish = typeof body.wish === 'string' ? body.wish.trim().slice(0, 200) : '';
+  // « fridge » : uniquement le frigo + placard. « shopping » : nouveaux ingrédients autorisés.
+  const mode: 'fridge' | 'shopping' = body.mode === 'shopping' ? 'shopping' : 'fridge';
 
   const today = todayISO();
   const monthStart = `${today.slice(0, 7)}-01`;
@@ -85,7 +87,9 @@ Deno.serve(async (req) => {
 
   // Les produits périmés ne sont pas proposés.
   const stock = (stockRes.data ?? []).filter((p) => !p.expires_on || daysUntil(p.expires_on) >= 0);
-  if (stock.length === 0) return json({ error: 'Ton frigo est vide : ajoute des achats dans Courses.' }, 400);
+  if (stock.length === 0 && mode === 'fridge') {
+    return json({ error: 'Ton frigo est vide : ajoute des achats dans Courses ou choisis « Nouveaux ingrédients ».' }, 400);
+  }
 
   const budget = Number(profileRes.data?.monthly_budget ?? 0);
   const spent = (monthRes.data ?? []).reduce((t, p) => t + Number(p.price), 0);
@@ -99,22 +103,40 @@ Deno.serve(async (req) => {
     })
     .join('\n');
 
+  const budgetLine =
+    remaining === null
+      ? 'Pas de budget fixé : reste sur des ingrédients abordables.'
+      : `Budget courses restant ce mois-ci : ${remaining.toFixed(2)} €. Le coût des achats de CHAQUE recette doit tenir dedans largement.`;
+
+  const modeLines =
+    mode === 'fridge'
+      ? [
+          `Propose ${MAX_RECIPES} recettes du quotidien réalisables UNIQUEMENT avec les articles du frigo ci-dessous, en priorité ceux qui périment bientôt.`,
+          'Tu peux seulement ajouter les basiques du placard : sel, poivre, huile, vinaigre, épices, herbes séchées, ail, oignon.',
+          'Rien d’autre : "to_buy" doit être une liste vide.',
+        ]
+      : [
+          `Propose ${MAX_RECIPES} recettes du quotidien variées et appétissantes, qui peuvent demander de nouveaux ingrédients à acheter.`,
+          stock.length
+            ? 'Utilise quand c’est pertinent les articles du frigo ci-dessous, surtout ceux qui périment bientôt, mais tu n’es pas limité au frigo.'
+            : 'Le frigo est vide : propose des recettes complètes avec leur liste de courses.',
+          'Les basiques du placard (sel, poivre, huile, vinaigre, épices) sont déjà là.',
+          budgetLine,
+          'Dans "to_buy", liste tous les ingrédients à acheter avec un prix estimé réaliste.',
+        ];
+
   const prompt = [
     'Tu es un coach culinaire français, simple et concret.',
-    `Propose ${MAX_RECIPES} recettes du quotidien en utilisant au maximum les articles du frigo ci-dessous, en priorité ceux qui périment bientôt.`,
-    'On considère que le sel, le poivre, l’huile, le vinaigre et les épices courantes sont déjà dans le placard.',
-    remaining === null
-      ? 'Pas de budget fixé : limite les achats complémentaires au strict nécessaire.'
-      : `Budget courses restant ce mois-ci : ${remaining.toFixed(2)} €. Le coût total des achats complémentaires de CHAQUE recette doit rester bien en dessous, idéalement moins de 6 €.`,
+    ...modeLines,
     challengeTypes.length
       ? `Contraintes obligatoires (défis en cours) : ${challengeTypes.map((t) => CHALLENGE_RULES[t]).join(' ; ')}.`
       : '',
     wish ? `Envie de l’utilisateur : « ${wish} ».` : '',
-    'Dans "uses", renvoie les numéros des articles du frigo utilisés. Dans "to_buy", seulement ce qui manque vraiment.',
+    'Dans "uses", renvoie les numéros des articles du frigo utilisés.',
     'Étapes courtes, 3 à 6 maximum. Aucun emoji.',
     '',
     'Frigo :',
-    stockLines,
+    stockLines || '(vide)',
   ]
     .filter(Boolean)
     .join('\n');
@@ -169,5 +191,5 @@ Deno.serve(async (req) => {
     };
   });
 
-  return json({ recipes, remaining_budget: remaining, challenges: challengeTypes });
+  return json({ mode, recipes, remaining_budget: remaining, challenges: challengeTypes });
 });

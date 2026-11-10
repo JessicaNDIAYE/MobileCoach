@@ -171,6 +171,38 @@ export function TextTabs<T extends string>({
   );
 }
 
+/** Choix exclusif en cartes : titre + description, l'option active passe en encre. */
+export function Choice<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string; hint: string; icon: IconName }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <View style={{ flexDirection: 'row', gap: 8 }}>
+      {options.map((o) => {
+        const active = o.value === value;
+        return (
+          <Pressable
+            key={o.value}
+            onPress={() => onChange(o.value)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: active }}
+            style={({ pressed }) => [s.choice, active && { backgroundColor: colors.ink }, pressed && s.pressed]}
+          >
+            <Feather name={o.icon} size={18} color={active ? '#fff' : colors.ink} />
+            <Text style={[s.bold, active && { color: '#fff' }]}>{o.label}</Text>
+            <Text style={[s.muted, active && { color: '#C9D1CC' }]}>{o.hint}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 /** Petite pilule contour (étiquette), cliquable si onPress. */
 export function Tag({ label, active, onPress }: { label: string; active?: boolean; onPress?: () => void }) {
   return (
@@ -272,6 +304,7 @@ export const s = StyleSheet.create({
   pillIcon: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.6 },
   tab: { fontSize: 15, fontWeight: '500', color: colors.inkSoft },
+  choice: { flex: 1, borderRadius: 20, padding: 14, gap: 6, backgroundColor: colors.soft },
   tag: {
     paddingVertical: 8,
     paddingHorizontal: 14,

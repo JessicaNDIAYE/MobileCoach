@@ -6,6 +6,7 @@ import { Alert, Pressable, Text, View } from 'react-native';
 
 import {
   Card,
+  Choice,
   CardHeader,
   Divider,
   Field,
@@ -20,18 +21,25 @@ import {
 import { CHALLENGES } from '@/lib/catalog';
 import { daysBetween, eur, today } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
-import type { RecipeSuggestions, SuggestedRecipe } from '@/lib/types';
+import type { RecipeMode, RecipeSuggestions, SuggestedRecipe } from '@/lib/types';
 import { useUserId } from '@/providers/AuthProvider';
 import { colors } from '@/theme';
 
 type StockItem = { id: string; name: string; expires_on: string | null };
 
 const CACHE_KEY = 'mobilecoach.recipes.last';
+const MODE_KEY = 'mobilecoach.recipes.mode';
+
+const MODES: { value: RecipeMode; label: string; hint: string; icon: 'box' | 'shopping-cart' }[] = [
+  { value: 'fridge', label: 'Mon frigo', hint: 'Seulement ce que j’ai, rien à acheter', icon: 'box' },
+  { value: 'shopping', label: 'Nouveaux ingrédients', hint: 'Des idées avec quelques courses', icon: 'shopping-cart' },
+];
 
 export default function RecettesScreen() {
   const userId = useUserId();
   const [stock, setStock] = useState<StockItem[]>([]);
   const [wish, setWish] = useState('');
+  const [mode, setMode] = useState<RecipeMode>('fridge');
   const [result, setResult] = useState<RecipeSuggestions | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,16 +58,25 @@ export default function RecettesScreen() {
 
   // Les dernières suggestions restent affichées d'une ouverture à l'autre.
   useEffect(() => {
-    AsyncStorage.getItem(CACHE_KEY)
-      .then((raw) => raw && setResult(JSON.parse(raw)))
+    AsyncStorage.multiGet([CACHE_KEY, MODE_KEY])
+      .then(([[, raw], [, savedMode]]) => {
+        if (raw) setResult(JSON.parse(raw));
+        if (savedMode === 'fridge' || savedMode === 'shopping') setMode(savedMode);
+      })
       .catch(() => {});
   }, []);
+
+  function changeMode(m: RecipeMode) {
+    setMode(m);
+    setError('');
+    AsyncStorage.setItem(MODE_KEY, m).catch(() => {});
+  }
 
   async function suggest() {
     setLoading(true);
     setError('');
     const { data, error: fnError } = await supabase.functions.invoke<RecipeSuggestions>('suggest-recipes', {
-      body: { wish: wish.trim() },
+      body: { wish: wish.trim(), mode },
     });
     setLoading(false);
     if (fnError || !data) {
@@ -137,10 +154,15 @@ export default function RecettesScreen() {
       </Card>
 
       <Card>
-        <CardHeader title="Une envie ?" />
+        <CardHeader title="Je cuisine avec" />
+        <Choice options={MODES} value={mode} onChange={changeMode} />
         <Field placeholder="Rapide, végétarien, pour 4…" value={wish} onChangeText={setWish} maxLength={200} />
         <PillButton label="Proposer des recettes" icon="arrow-right" onPress={suggest} loading={loading} />
-        <Muted>Selon ton frigo, ton budget restant et tes défis en cours.</Muted>
+        <Muted>
+          {mode === 'fridge'
+            ? 'Uniquement tes produits et les basiques du placard, en respectant tes défis.'
+            : 'Ton frigo en priorité, plus quelques achats qui tiennent dans ton budget.'}
+        </Muted>
         {error !== '' && (
           <Row>
             <Feather name="alert-circle" size={14} color={colors.clay} />
@@ -153,6 +175,7 @@ export default function RecettesScreen() {
         <View style={{ paddingHorizontal: 4, gap: 2 }}>
           <Stats
             items={[
+              ['Mode', result.mode === 'shopping' ? 'nouveaux ingrédients' : 'mon frigo'],
               ['Budget restant', result.remaining_budget === null ? 'non défini' : eur(result.remaining_budget)],
               ...(result.challenges.length ? ([['Défi', result.challenges.map((c) => CHALLENGES[c].label).join(', ')]] as [string, string][]) : []),
             ]}

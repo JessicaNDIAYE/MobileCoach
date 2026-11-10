@@ -60,7 +60,7 @@ supabase functions deploy suggest-recipes
 - **Compte** : inscription / connexion par email (session gardée sur le téléphone).
 - **Profil & poids** : objectif perte, prise ou maintien, poids cible, pesée du jour (une par jour), courbe avec la ligne d'objectif.
 - **Courses & budget** : budget mensuel, jauge avec alerte à 80 % et au dépassement, ajout d'achats (magasin, catégorie, date de péremption), répartition par catégorie, statut « encore au frigo » (servira aux recettes).
-- **Recettes** : Gemini propose 4 recettes à partir du frigo (produits qui périment en priorité), du budget restant du mois et des défis en cours. Chaque recette donne ce qu'il reste à acheter avec un prix estimé. « J'ai cuisiné » sort les produits du frigo et ajoute les fibres au défi du jour.
+- **Recettes** : au choix, « Mon frigo » (uniquement ce qu'on a + les basiques du placard, rien à acheter) ou « Nouveaux ingrédients » (le frigo en priorité + quelques courses dans le budget). Gemini propose 4 recettes en tenant compte des produits qui périment, du budget restant du mois et des défis en cours. Chaque recette donne ce qu'il reste à acheter avec un prix estimé. « J'ai cuisiné » sort les produits du frigo et ajoute les fibres au défi du jour.
 - **Défis entre amis** :
   - 🍬 Zéro sucre et 🥖 Low carb : on valide chaque jour « réussi » ou « craqué ».
   - 🥦 Fibres max : on additionne les grammes avec des raccourcis (pomme, avoine…), la journée est validée à 30 g.
