@@ -35,7 +35,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
-    "legal:build": "node scripts/build-legal-pages.mjs"
+    "legal:build": "node scripts/build-legal-pages.mjs",
+    "recipes:check": "npx --yes tsx scripts/check-recipes.ts"
   },
   "private": true
 }

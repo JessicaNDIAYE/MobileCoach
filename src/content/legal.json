@@ -36,7 +36,7 @@
           "Faire fonctionner ton compte et synchroniser tes données entre tes appareils.",
           "Afficher ton suivi de poids, ton budget et tes statistiques.",
           "Organiser les défis entre amis et le classement.",
-          "Te proposer des recettes adaptées à ton frigo, ton budget et tes défis."
+          "Te proposer des recettes adaptées à ton frigo, ton budget et tes défis. Ces suggestions sont calculées directement sur ton téléphone, sans rien envoyer."
         ]
       },
       {
@@ -51,7 +51,7 @@
         "title": "Avec qui elles sont partagées",
         "bullets": [
           "Supabase (hébergement de la base de données et de l’authentification) : stocke l’ensemble des données de ton compte.",
-          "Google (API Gemini), uniquement quand tu demandes des recettes : reçoit les noms des produits de ton frigo, leurs dates de péremption et l’envie que tu as saisie, ainsi que ton budget restant du mois et le type de tes défis en cours si ces modules sont activés. Ton email, ton pseudo et ton poids ne sont jamais envoyés.",
+          "Google (API Gemini), uniquement si tu touches « Plus d’idées » dans l’onglet Recettes et après ton accord : reçoit les noms des produits de ton frigo, leurs dates de péremption et l’envie que tu as saisie, ainsi que ton budget restant du mois et le type de tes défis en cours si ces modules sont activés. Ton email, ton pseudo et ton poids ne sont jamais envoyés.",
           "Tes amis : dans un défi partagé, les autres participants voient ton pseudo, tes jours réussis et, pour le défi fibres, ton total de fibres. Ils ne voient ni ton poids, ni tes courses, ni ton budget."
         ],
         "paragraphs": [
@@ -113,7 +113,7 @@
       {
         "title": "Recettes proposées automatiquement",
         "paragraphs": [
-          "Les recettes sont générées automatiquement par un service tiers (Google Gemini) à partir de tes données. Elles peuvent contenir des erreurs : vérifie toujours les ingrédients, les allergènes, les quantités et la cuisson. Les prix affichés sont des estimations indicatives."
+          "Les recettes sont proposées par un algorithme à partir d’une base de recettes intégrée à l’application. Si tu touches « Plus d’idées », des recettes supplémentaires sont générées automatiquement par un service tiers (Google Gemini) et peuvent contenir des erreurs. Dans tous les cas, vérifie les ingrédients, les allergènes, les quantités et la cuisson. Les prix affichés sont des estimations indicatives."
         ]
       },
       {

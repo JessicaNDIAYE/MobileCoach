@@ -62,7 +62,7 @@ supabase functions deploy suggest-recipes
 - **Compte** : inscription / connexion par email (session gardée sur le téléphone), suppression du compte depuis l'app.
 - **Profil & poids** : objectif perte, prise ou maintien, poids cible, pesée du jour (une par jour), courbe avec la ligne d'objectif.
 - **Courses & budget** : budget mensuel, jauge avec alerte à 80 % et au dépassement, ajout d'achats (magasin, catégorie, date de péremption), répartition par catégorie, statut « encore au frigo » (servira aux recettes).
-- **Recettes** : au choix, « Mon frigo » (uniquement ce qu'on a + les basiques du placard, rien à acheter) ou « Nouveaux ingrédients » (le frigo en priorité + quelques courses dans le budget). Gemini propose 4 recettes en tenant compte des produits qui périment, du budget restant du mois et des défis en cours. Chaque recette donne ce qu'il reste à acheter avec un prix estimé. « J'ai cuisiné » sort les produits du frigo et ajoute les fibres au défi du jour.
+- **Recettes** : moteur 100 % local (`src/lib/recipeEngine.ts`) sur une base de 105 recettes rédigées pour l'app (`src/content/recipes.ts`) et un dictionnaire de 77 ingrédients en 16 familles (`src/content/ingredients.ts`). Recettes « caméléons » : un ingrédient peut être rempli par toute une famille (poulet / dinde / tofu). Deux modes : « Mon frigo » (rien à acheter) ou « Nouveaux ingrédients » (3 achats max, coût estimé). Priorité aux produits qui périment, filtres défis (zéro sucre, low carb, bonus fibres) et envie (rapide, végétarien, mots-clés). Instantané, hors ligne, rien n'est envoyé. En option, « Plus d'idées » interroge Gemini après consentement. « J'ai cuisiné » sort les produits du frigo et ajoute les fibres au défi du jour.
 - **Défis entre amis** :
   - 🍬 Zéro sucre et 🥖 Low carb : on valide chaque jour « réussi » ou « craqué ».
   - 🥦 Fibres max : on additionne les grammes avec des raccourcis (pomme, avoine…), la journée est validée à 30 g.
@@ -136,3 +136,9 @@ Sécurité (RLS) : chacun ne voit que ses propres données. Les défis, check-in
 ```bash
 npm run typecheck
 ```
+
+```bash
+npm run recipes:check
+```
+
+`recipes:check` vérifie la base de recettes (ingrédients connus, identifiants uniques) et rejoue des scénarios du moteur. Pour ajouter une recette : une ligne `r(...)` dans `src/content/recipes.ts`, puis relancer ce script.
