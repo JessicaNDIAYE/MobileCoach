@@ -22,7 +22,10 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.jessicandiaye.nutrika"
+      "package": "com.jessicandiaye.nutrika",
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,6 +43,18 @@
     "scheme": "nutrika",
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c4b059c5-a832-4675-8b48-dceb51eb4d8a"
+      }
+    },
+    "owner": "ndjsn11",
+    "updates": {
+      "url": "https://u.expo.dev/c4b059c5-a832-4675-8b48-dceb51eb4d8a"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
