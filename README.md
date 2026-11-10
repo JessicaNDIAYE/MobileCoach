@@ -105,6 +105,10 @@ Déjà dans l'app :
 | Identifiants › Identifiant utilisateur | id du compte | oui | fonctionnalité de l'app |
 | Autres données | courses, budget, défis | oui | fonctionnalité de l'app |
 
+## Icône
+
+Source : `assets/icon/icon.svg`. 4 pièces de puzzle, une par module : pomme (aliments), haltère (forme), ampoule (idées), fourchette (recettes). Les PNG dans `assets/` en sont générés. `icon.png` doit rester en 1024 × 1024, **sans transparence** (exigence App Store).
+
 ## Base de données
 
 | Table | Rôle |
