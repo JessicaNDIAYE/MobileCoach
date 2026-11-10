@@ -8,6 +8,7 @@ import { colors } from '@/theme';
 const TABS: Record<string, { label: string; icon: IconName }> = {
   index: { label: 'Profil', icon: 'activity' },
   courses: { label: 'Courses', icon: 'shopping-bag' },
+  recettes: { label: 'Recettes', icon: 'book-open' },
   defis: { label: 'Défis', icon: 'award' },
 };
 
